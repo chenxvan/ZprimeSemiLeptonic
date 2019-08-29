@@ -1,7 +1,7 @@
 #include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicSelections.h>
 #include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicModules.h>
 #include <UHH2/ZprimeSemiLeptonic/include/utils.h>
-
+//#include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicUtils.h>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -394,3 +394,16 @@ bool uhh2::GenFlavorSelection::passes(const uhh2::Event& event){
 
   return pass;
 }
+
+
+//////adding it from the old release, not sure if we still need it.                                                            
+uhh2::HTlepCut::HTlepCut(float min_htlep, float max_htlep):
+  min_htlep_(min_htlep), max_htlep_(max_htlep) {}
+
+bool uhh2::HTlepCut::passes(const uhh2::Event& event){
+
+  float htlep = HTlep1(event);
+
+  return (htlep > min_htlep_) && (htlep < max_htlep_);
+}
+////////////////////////////////////////////////////////                                                                       

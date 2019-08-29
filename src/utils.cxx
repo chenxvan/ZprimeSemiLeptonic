@@ -18,3 +18,25 @@ std::vector<std::string> util::string_tokens(const std::string& str, const std::
 
   return toks;
 }
+
+//copoed from the old release
+float HTlep(const uhh2::Event& event){
+
+  float htlep(0.);
+
+  assert((event.muons || event.electrons) && event.met);
+
+  if(event.muons)    { for(const auto& mu : *event.muons)     htlep += mu.pt(); }
+  if(event.electrons){ for(const auto& el : *event.electrons) htlep += el.pt(); }
+
+  htlep += event.met->pt();
+
+  return htlep;
+}
+
+float HTlep1(const uhh2::Event& event){
+
+  assert((event.muons || event.electrons) && event.met);
+
+  return (leading_lepton(event)->pt() + event.met->pt());
+}

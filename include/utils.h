@@ -4,6 +4,8 @@
 #include <vector>
 #include <stdexcept>
 
+#include <UHH2/core/include/AnalysisModule.h>
+#include <UHH2/core/include/Event.h>
 #include <UHH2/core/include/NtupleObjects.h>
 
 namespace util {
@@ -28,3 +30,8 @@ float util::pfMINIIso(const LEP& lep, const std::string& iso_key_){
 
   return iso;
 }
+
+///not sure if we need, copied from the old release
+const Particle* leading_lepton(const uhh2::Event&);
+float HTlep (const uhh2::Event&);
+float HTlep1(const uhh2::Event&);

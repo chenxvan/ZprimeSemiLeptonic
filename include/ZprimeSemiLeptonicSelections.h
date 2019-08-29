@@ -18,6 +18,17 @@
 
 namespace uhh2 {
 
+  ///adding it from the old release, not sure if we still need it                                                              
+  class HTlepCut : public Selection {
+  public:
+    explicit HTlepCut(float, float max_htlep=infinity);
+    virtual bool passes(const Event&) override;
+
+  private:
+    float min_htlep_, max_htlep_;
+  };
+  /////
+
 
 
   class BlindDataSelection : public Selection{
@@ -104,15 +115,15 @@ namespace uhh2 {
   };
   ////
 
-  class TwoDCut1 : public Selection {
+  /* class TwoDCut1 : public Selection { */
 
-  public:
-    explicit TwoDCut1(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {}
-    virtual bool passes(const Event&) override;
+  /* public: */
+  /*   explicit TwoDCut1(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {} */
+  /*   virtual bool passes(const Event&) override; */
 
-  private:
-    float min_deltaR_, min_pTrel_;
-  };
+  /* private: */
+  /*   float min_deltaR_, min_pTrel_; */
+  /* }; */
   ////
 
   class TwoDCutALL : public Selection {
