@@ -336,6 +336,35 @@ bool uhh2::METCut::passes(const uhh2::Event& event){
 // }
 ////////////////////////////////////////////////////////
 
+bool uhh2::TwoDCutALL::passes(const uhh2::Event& event){
+
+  assert(event.muons && event.electrons && event.jets);
+
+  for(const auto& muo : *event.muons){
+
+    float drmin, ptrel;
+    std::tie(drmin, ptrel) = drmin_pTrel(muo, *event.jets);
+
+    const bool pass = (drmin > min_deltaR_) || (ptrel > min_pTrel_);
+    if(!pass) return false;
+  }
+
+  for(const auto& ele : *event.electrons){
+
+    float drmin, ptrel;
+    std::tie(drmin, ptrel) = drmin_pTrel(ele, *event.jets);
+
+    const bool pass = (drmin > min_deltaR_) || (ptrel > min_pTrel_);
+    if(!pass) return false;
+  }
+
+  return true;
+}
+////////////////////////////////////////////////////////
+
+
+
+
 bool uhh2::TwoDCut::passes(const uhh2::Event& event){
 
   assert(event.muons || event.electrons);
