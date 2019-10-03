@@ -214,7 +214,8 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
 
   //// OBJ CLEANING
   //  const     MuonId muoSR(AndId<Muon>    (PtEtaCut  (muon1_pt, 2.5), MuonIDTight()));
-  const     MuonId muoSR((PtEtaCut(muon1_pt, 2.5), MuonID(Muon::CutBasedIdTight)));
+  //  const     MuonId muoSR((PtEtaCut(muon1_pt, 2.5), MuonID(Muon::CutBasedIdTight)));
+  const MuonId muoSR(AndId<Muon> (PtEtaCut(muon1_pt, 2.5), MuonID(Muon::CutBasedIdTight)));
   const ElectronId eleSR(AndId<Electron>(PtEtaSCCut(ele1_pt, 2.4), eleID));
   muoSR_cleaner.reset(new     MuonCleaner(muoSR));
   eleSR_cleaner.reset(new ElectronCleaner(eleSR));
@@ -558,7 +559,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   bool pass_dilep(0);
   pass_dilep = (event.muons->size()==1) && (event.electrons->size()==1) && (event.muons->at(0).charge()!=event.electrons->at(0).charge());  //electron-muon
   if(!pass_dilep) return false;
-  if(!(event.muons->at(0).pt() > 55. && (abs(event.muons->at(0).eta()) <2.5))) return false;
+  //  if(!(event.muons->at(0).pt() > 55. && (abs(event.muons->at(0).eta()) <2.5))) return false;
   //  if(!(event.electrons->at(0).pt() > 50. && (abs(event.electrons->at(0).eta()) <2.4))) return false;
 
   HFolder("dilep")->fill(event);
