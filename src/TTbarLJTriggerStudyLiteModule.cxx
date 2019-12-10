@@ -71,6 +71,8 @@ class TTbarLJTriggerStudyLiteModule : public ModuleBASE {
   std::unique_ptr<uhh2::Selection> htlep_sel;
   //  std::unique_ptr<uhh2::Selection> triangc_sel;
   std::unique_ptr<uhh2::Selection> twodcut_sel;
+  std::unique_ptr<Selection> sel_1btag, sel_2btag;
+
   // cleaners
   std::unique_ptr<MuonCleaner>     muoSR_cleaner;
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
@@ -86,6 +88,9 @@ class TTbarLJTriggerStudyLiteModule : public ModuleBASE {
   std::unique_ptr<JetLeptonCleaner_by_KEYmatching> JLC_A, JLC_B, JLC_C, JLC_D,JLC_E, JLC_F, JLC_G, JLC_H, JLC_MC;
   std::unique_ptr<JetCleaner>                      jet_cleaner1;
   std::unique_ptr<JetCleaner>                      jet_cleaner2;
+  
+  //???
+  std::unique_ptr<AnalysisModule> LumiWeight_module, PUWeight_module;
 
   JetId btag_ID_;
   CSVBTag::wp b_working_point;
@@ -147,7 +152,7 @@ class TTbarLJTriggerStudyLiteModule : public ModuleBASE {
   std::unique_ptr<Hists> lumihists_jet1; std::unique_ptr<Hists> lumihists_met;
   std::unique_ptr<Hists> lumihists_tag; std::unique_ptr<Hists> lumihists_probe;
 
-
+  string Sys_PU;
   //new for the 2017, 2018
   bool is2016v2, is2016v3, is2017, is2018;
   bool isMC, ispuppi;
@@ -190,17 +195,18 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   use_ttagging_ = false;
   muon1_pt = 55.;
   //  ele1_pt = 50.; 
-  //jet1_pt  = 185.;
-    ele1_pt = 50.; 
-    jet1_pt  = 185.;
-  //  jet1_pt  = 160.;
+  jet1_pt  = 125.;
+  ele1_pt = 55.; 
+  //jet1_pt  = 50.;
+  //jet1_pt  = 125.;
   //  jet1_pt  = 200.;
 
   jet2_pt  = 50.; 
   //  jet2_pt  = 30.; 
   //  MET      =  50.;
-  MET      =  120.;
-  HT_lep   = 150.;  //used the value from the 2016 analysis note, might need to change it later
+  MET      =  75.;
+  
+  //  HT_lep   = 150.;  //used the value from the 2016 analysis note, might need to change it later
 
 
   //// COMMON MODULES
@@ -233,6 +239,7 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   std::vector<std::string> JEC_AK8CHS_A, JEC_AK8CHS_B, JEC_AK8CHS_C, JEC_AK8CHS_D, JEC_AK8CHS_E, JEC_AK8CHS_F, JEC_AK8CHS_G, JEC_AK8CHS_H;
   std::vector<std::string> JEC_AK8Puppi_A, JEC_AK8Puppi_B, JEC_AK8Puppi_C, JEC_AK8Puppi_D, JEC_AK8Puppi_E, JEC_AK8Puppi_F, JEC_AK8Puppi_G, JEC_AK8Puppi_H;
 
+
   if(is2017){
     cout<<"ZprimePreselectionModule uses JEC for 2017 data/MC"<<endl;
     JEC_AK4CHS_B       = JERFiles::Fall17_17Nov2017_V32_B_L123_AK4PFchs_DATA;
@@ -255,6 +262,7 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
     JEC_AK4Puppi_E = JERFiles::Fall17_17Nov2017_V32_E_L123_AK4PFPuppi_DATA;
     JEC_AK4Puppi_F = JERFiles::Fall17_17Nov2017_V32_F_L123_AK4PFPuppi_DATA;
     JEC_AK4Puppi_MC = JERFiles::Fall17_17Nov2017_V32_L123_AK4PFPuppi_MC;
+    
 
     JEC_AK8Puppi_B = JERFiles::Fall17_17Nov2017_V32_B_L123_AK8PFPuppi_DATA;
     JEC_AK8Puppi_C = JERFiles::Fall17_17Nov2017_V32_C_L123_AK8PFPuppi_DATA;
@@ -367,6 +375,29 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   jet_cleaner1.reset(new JetCleaner(ctx, 15., 3.0));
   jet_cleaner2.reset(new JetCleaner(ctx, 30., 2.4));
 
+
+
+  //set up JEC and JLC
+  //  init_JEC_JLC(ctx);
+  
+  if(isMC){
+    //    ctx.declare_event_input<std::vector<Particle> >(ctx.get("TopJetCollectionGEN"), "topjetsGEN");
+    if(is2016v2 || is2016v3){
+      if(!ispuppi) jetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Summer16_25nsV1, "2016/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt"));
+      else jetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Summer16_25nsV1, "2016/Summer16_25nsV1_MC_PtResolution_AK4PFPuppi.txt"));
+
+    }
+    if(is2017){
+      if(!ispuppi) jetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Fall17_V3, "2017/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
+      else jetER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Fall17_V3, "2017/Fall17_V3_MC_PtResolution_AK4PFPuppi.txt"));
+
+    }
+
+  }
+
+
+
+
   //// EVENT SELECTION
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(jet2_pt, 2.4))));
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(jet1_pt, 2.4))));
@@ -405,17 +436,34 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   htlep_sel.reset(new HTlepCut(HT_lep, uhh2::infinity));
   twodcut_sel.reset(new TwoDCutALL(0.4, 20.)); //may need to change
   // twodcut_sel.reset(new TwoDCut1(0.4, 20.));
+  //???
+  Sys_PU = ctx.get("Sys_PU");
 
+  LumiWeight_module.reset(new MCLumiWeight(ctx));
+  PUWeight_module.reset(new MCPileupReweight(ctx, Sys_PU));
+
+  
+  // btag 
+  CSVBTag::wp btag_wp = CSVBTag::WP_TIGHT; // b-tag workingpoint
+  JetId id_btag = CSVBTag(btag_wp);
+  //  sel_1btag.reset(new NJetSelection(1, 1, id_btag));
+  sel_1btag.reset(new NJetSelection(1,-1, id_btag));
+  sel_2btag.reset(new NJetSelection(2,-1, id_btag));
+
+  
   //// HISTS
   std::vector<std::string> htags_1({
-      "nosel",
-      "dilep",
-      "twodcut",
-      "jet2",
-      "jet1",
-       "met",
-      "tag",
-      "tagNprobe",
+        "nosel",
+	 "class3",
+	"dilep",
+	"twodcut",
+	"jet2",
+	"jet1",
+	"btag2",
+	"btag1",
+	"met",
+	"tag",
+	"tagNprobe",
   });
 
   for(const auto& tag : htags_1){
@@ -464,11 +512,11 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   ctx.undeclare_all_event_output();
 
   //pileup (define it after undeclaring all other variables to keep the weights in the output)
-  pileupSF.reset(new MCPileupReweight(ctx));
+  //  pileupSF.reset(new MCPileupReweight(ctx));
 
   //muon scale factors
   muonID_SF.reset(new MCMuonScaleFactor(ctx, muonID_SFac, muonID_directory, 1.0, "ID"));
-    muonHLT_SF.reset(new MCMuonScaleFactor(ctx, muonHLT_SFac, muonHLT_directory, 0.5, "HLT"));
+  muonHLT_SF.reset(new MCMuonScaleFactor(ctx, muonHLT_SFac, muonHLT_directory, 0.5, "HLT"));
   //  muonTRK_SF.reset(new MCMuonTrkScaleFactor(ctx, muonTRK_SFac, 0.0, "TRK"));
 
   //electron scale factors
@@ -499,6 +547,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   int jet_n = event.jets->size();
   if(jet_n<2) return false;
 
+
   HFolder("nosel")->fill(event);
   if(event.isRealData) lumihists_nosel->fill(event);
   //double w_before = event.weight;
@@ -525,7 +574,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
 
 
   //pileup
-  pileupSF->process(event);
+  //  pileupSF->process(event);
 
   // //  std::cout<<" event.weight [after pileup] = "<<event.weight<<std::endl;
   // // // b-tagging
@@ -543,13 +592,13 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   //  double w_before = event.weight;
   //  std::cout<<" event.weight [BEFORE] = "<<event.weight<<std::endl;
   // muon SFs
-  muonID_SF->process(event);
-  muonHLT_SF->process(event);
+  muonID_SF->process(event);//***
+  muonHLT_SF->process(event);//***
   //  muonTRK_SF->process(event);
 
   // elec SFs
-  elecID_SF->process(event);
-  elecGsf_SF->process(event);
+  elecID_SF->process(event);//***
+  elecGsf_SF->process(event); //***
   // //  double w_after = event.weight;
   // //std::cout<<" event.weight [AFTER lepton SFs] = "<<event.weight<<std::endl;
   //  double w_after_lepSFs = event.weight;
@@ -558,15 +607,39 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   //di-lepton selection
   bool pass_dilep(0);
   pass_dilep = (event.muons->size()==1) && (event.electrons->size()==1) && (event.muons->at(0).charge()!=event.electrons->at(0).charge());  //electron-muon
+  //pass_dilep = (event.electrons->size()==1 && (event.muons->size()==0));
+  //pass_dilep = (event.electrons->size()==0 && (event.muons->size()==1));
+
+
+  //veto for 2018
+  if(is2018){
+    if(event.isRealData){
+      for(const auto& ele : *event.electrons){
+	if ((ele.v4().eta() > -2.4) && (ele.v4().eta() < -1.2)) return false;
+      }
+      for(const auto& jet : *event.jets){
+	if ((jet.v4().eta() > -2.4) && (jet.v4().eta() < -1.2)) return false;
+      }
+    }
+    else{
+      for(const auto& ele : *event.electrons){
+	if ((ele.v4().eta() > -2.4) && (ele.v4().eta() < -1.2)) event.weight = 0.35;
+      }
+      for(const auto& jet : *event.jets){
+	if ((jet.v4().eta() > -2.4) && (jet.v4().eta() < -1.2)) event.weight = 0.35;
+      }
+
+    }
+  }
+
+
   if(!pass_dilep) return false;
-  //  if(!(event.muons->at(0).pt() > 55. && (abs(event.muons->at(0).eta()) <2.5))) return false;
-  //  if(!(event.electrons->at(0).pt() > 50. && (abs(event.electrons->at(0).eta()) <2.4))) return false;
 
   HFolder("dilep")->fill(event);
   if(event.isRealData) lumihists_dilep->fill(event);
 
-
-  if(event.electrons->at(0).Class()==4) return false;//TEST veto gap electrons  
+  if(event.electrons->at(0).Class()==3) HFolder("class3")->fill(event);
+  //  if(event.electrons->at(0).Class()==4) return false;//TEST veto gap electrons  
 
   // // //// JET selection
   jet_IDcleaner->process(event);
@@ -666,6 +739,11 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
    //    cout<<"JLC, JEC, JER ..."<<endl;
    JLC_MC->process(event);
    jet_corrector_MC->process(event);
+   if(jetER_smearer.get()){
+     //      cout<<" Start JER_smearer "<<endl;
+     jetER_smearer->process(event);
+   }
+   
    jet_corrector_MC->correct_met(event);
 
  }
@@ -675,7 +753,8 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
 
-
+  //  const bool jet_n = (event.jets->size() >= 2);
+  //  if (!jet_n) return false;
 
   //  const int 
   jet_n = event.jets->size();
@@ -708,10 +787,16 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   }
 
   // //// LEPTON-2Dcut selection
-   if(!pass_twodcut) return false;
-   HFolder("twodcut")->fill(event);
-   if(event.isRealData) lumihists_twodcut->fill(event);
-   jet_cleaner2->process(event);                                                                                                   
+  //  if(!pass_twodcut) return false;
+  HFolder("twodcut")->fill(event);
+  if(event.isRealData) lumihists_twodcut->fill(event);
+
+
+  //???
+  LumiWeight_module->process(event);
+  PUWeight_module->process(event);
+
+  jet_cleaner2->process(event);                                                                                                   
   sort_by_pt<Jet>(*event.jets);
 
   // /* 2nd AK4 jet selection */
@@ -726,6 +811,15 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   if(!pass_jet1) return false;
   HFolder("jet1")->fill(event);
   if(event.isRealData) lumihists_jet1->fill(event);
+  
+  //btag
+  if(!sel_2btag->passes(event)) return false;
+  HFolder("btag2")->fill(event);
+
+  if(!sel_1btag->passes(event)) return false;
+  HFolder("btag1")->fill(event);
+
+
   //// MET selection
   const bool pass_met = met_sel->passes(event);
   if(!pass_met) return false;
@@ -741,6 +835,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
 
   if(!pass_tag_trigger && !pass_tag_trigger2 && !pass_tag_trigger3) return false;
   //if(!pass_tag_trigger) return false; //TEST
+  //if(!pass_tag_trigger && !pass_tag_trigger2) return false; 
   HFolder("tag")->fill(event);
   //  double w_after = event.weight;
   //  std::cout<<" event.weight = "<<event.weight<<std::endl;
