@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JobConfiguration PUBLIC "" "JobConfig.dtd" [
+
+
+
+<!ENTITY KEYW "T1_v01">
+<!ENTITY btag_workpoint "CSVM">
+<!ENTITY channel "elec">
+<!-- <!ENTITY channel "muon"> -->
+<!ENTITY NEVT            "-1">
+<!ENTITY IS_PUPPI        "true">
+<!ENTITY TargetLumi      "35921.908907">
+<!-- <!ENTITY TargetLumi      "36734"> -->
+<!ENTITY b_Cacheable     "False">
+
+
+<!ENTITY HLT  "Ele50_CaloIdVT_GsfTrkIdT_PFJet165">
+<!ENTITY HLT2 "Ele115_CaloIdVT_GsfTrkIdT">
+<!-- <!ENTITY HLT  "Ele40_WPTight_Gsf"> -->
+<!-- <!ENTITY HLT2  "PFHT500_PFMET100_PFMHT100_IDTight"> -->
+<!ENTITY HLT3 "NULL">
+<!ENTITY HLT4 "NULL"> 
+<!ENTITY HLT5 "NULL"> 
+<!ENTITY HLT6 "NULL">
+<!-- <!ENTITY HLT4 "PFHT800"> 
+<!ENTITY HLT5 "PFHT900"> -->  
+<!-- <!ENTITY HLT6 "PFJet450"> -->
+<!-- <!ENTITY HLT6 "AK8PFJet450">  -->
+<!-- <!ENTITY HLT2 "PFHT800"> -->
+<!-- <!ENTITY HLT2 "PFHT900"> -->
+<!-- <!ENTITY HLT2 "PFHT200"> -->
+<!--  <!ENTITY HLT2 "PFJet450"> -->
+<!-- HLT_PFHT300_PFMET100_v*, HLT_PFJet450_v*, HLT_PFJet500_v5, HLT_PFHT125_v2, HLT_PFHT200_v3,  HLT_PFHT800_v4, HLT_PFHT900_v3  -->
+<!-- <!ENTITY HLT2 "NULL"> -->
+<!ENTITY HLT_tag  "Mu50">
+<!ENTITY HLT_tag2  "TkMu50">
+<!ENTITY HLT_tag3  "NULL">
+
+<!ENTITY OUTdir "/nfs/dust/cms/user/xuan/Zprime_102X/Trigger_2016/">
+<!ENTITY DATA_SingleMuon_Run2016B SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunB.xml">
+<!ENTITY DATA_SingleMuon_Run2016C SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunC.xml">
+<!ENTITY DATA_SingleMuon_Run2016D SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunD.xml">
+<!ENTITY DATA_SingleMuon_Run2016E SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunE.xml">
+<!ENTITY DATA_SingleMuon_Run2016F SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunF.xml">
+<!ENTITY DATA_SingleMuon_Run2016G SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunG.xml">
+<!ENTITY DATA_SingleMuon_Run2016H SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/DATA_SingleMuon2016_RunH.xml">
+
+
+<!ENTITY TTbar_part1_2016v3 SYSTEM  "../../common/datasets/RunII_102X_v1/2016v3/MC_TT_TuneCUETP8M2T4.xml">
+
+
+]>
+
+<!--
+<ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="10" AutoResubmit="100"/>
+<ConfigSGE RAM="2" DISK="2" Mail="xuan@fnal.gov" Notification="as" Workdir="workdir_Zprime_PreSelec_2016_ele_ht500"/>
+-->
+
+<JobConfiguration JobName="TTbarLJAnalysisLiteJob" OutputLevel="INFO">
+	<Library Name="libSUHH2ZprimeSemiLeptonic"/>
+	<Package Name="SUHH2ZprimeSemiLeptonic.par"/>
+
+	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="&TargetLumi;">
+
+	  <!-- <InputData Version="TTbar_2016v3" Lumi="186543.350" Type="MC" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &TTbar_part1_2016v3;  <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+
+	  <InputData Version="DATA_SingleMuon_Run2016B" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False">
+            &DATA_SingleMuon_Run2016B;
+            <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData>
+	  
+          <!-- <InputData Version="DATA_SingleMuon_Run2016C" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &DATA_SingleMuon_Run2016C; -->
+          <!--   <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+	
+	  <!-- <InputData Version="DATA_SingleMuon_Run2016D" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &DATA_SingleMuon_Run2016D; -->
+          <!--   <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+          <!-- <InputData Version="DATA_SingleMuon_Run2016E" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &DATA_SingleMuon_Run2016E; -->
+          <!--   <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+          <!-- <InputData Version="DATA_SingleMuon_Run2016F" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &DATA_SingleMuon_Run2016F; -->
+          <!--   <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+          <!-- <InputData Version="DATA_SingleMuon_Run2016G" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &DATA_SingleMuon_Run2016G; -->
+          <!--   <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+          <!-- <InputData Version="DATA_SingleMuon_Run2016H" Lumi="35921.908907" Type="DATA" NEventsMax="&NEVT;" Cacheable="False"> -->
+          <!--   &DATA_SingleMuon_Run2016H; -->
+          <!--   <InputTree Name="AnalysisTree"/> <OutputTree Name="AnalysisTree"/> </InputData> -->
+
+
+
+
+
+
+	  
+	  <UserConfig>
+			<Item Name="PrimaryVertexCollection" Value="offlineSlimmedPrimaryVertices"/>
+			<Item Name="GenParticleCollection"   Value="GenParticles"/>
+			<Item Name="ElectronCollection"      Value="slimmedElectronsUSER"/>
+			<Item Name="MuonCollection"          Value="slimmedMuonsUSER"/>
+			<!-- <Item Name="TauCollection"           Value="slimmedTaus"/> -->
+			<Item Name="JetCollection"           Value="jetsAk4Puppi"/>
+			<Item Name="GenJetCollection"        Value="slimmedGenJets"/> 
+			<!-- <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/> -->
+
+			<Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop"/> <!-- Check odinary ak8GenJetsFat !--> <!-- new in ntuples! -->
+			<Item Name="TopPuppiJetCollection"   Value="jetsAk8PuppiSubstructure_SoftDropPuppi"/>
+			<Item Name="METName"                 Value="slimmedMETsPuppi"/>
+			<Item Name="genMETName"              Value="slimmedMETs_GenMET"/>
+
+			<Item Name="lumi_file" Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.root"/>
+			<Item Name="lumihists_lumi_per_bin" Value="500.0"/>
+
+			<Item Name="is_puppi" Value="&IS_PUPPI;"/>
+
+			<!-- adding for the trigger -->
+
+			<Item Name="keyword" Value="&KEYW;"/>
+			<Item Name="channel" Value="&channel;"/>
+			<Item Name="probe_trigger" Value="HLT_&HLT;_v*"/>
+			<Item Name="probe_trigger2" Value="HLT_&HLT2;_v*"/>
+			<Item Name="probe_trigger3" Value="HLT_&HLT3;_v*"/>
+			<Item Name="probe_trigger4" Value="HLT_&HLT4;_v*"/>
+			<Item Name="probe_trigger5" Value="HLT_&HLT5;_v*"/>
+			<Item Name="probe_trigger6" Value="HLT_&HLT6;_v*"/>
+
+
+			<Item Name="tag_trigger" Value="HLT_&HLT_tag;_v*"/>
+			<Item Name="tag_trigger2" Value="HLT_&HLT_tag2;_v*"/>
+			<Item Name="tag_trigger3" Value="&HLT_tag3;"/>
+
+
+
+			<Item Name="pileup_directory"           Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyMCPileupHistogram.root"/>
+			<Item Name="pileup_directory_data"      Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram.root"/>
+			<Item Name="pileup_directory_data_up"   Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_72383.root"/>
+			<Item Name="pileup_directory_data_down" Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/MyDataPileupHistogram_66017.root"/>
+
+			<Item Name="muonID_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonID_EfficienciesAndSF_average_RunBtoH.root"/>
+			<Item Name="muonID_SF_directory"  Value="NUM_TightID_DEN_genTracks_eta_pt"/>
+			<Item Name="muonHLT_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/MuonTrigger_EfficienciesAndSF_average_RunBtoH.root"/>
+
+			<Item Name="muonHLT_SF_directory"  Value="IsoMu50_OR_IsoTkMu50_PtEtaBins/"/>
+			<!-- <Item Name="muonHLT_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/MuonHLT_EfficienciesAndSF_NoIso_average_RunBtoF.root"/> -->
+
+                        <!-- <Item Name="muonHLT_SF_directory"  Value="ID_SF_NUM_TightID_DEN_genTracks_PAR_pt_eta_id/"/> -->
+			<Item Name="muonTRK_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/general_eff_aeta_dr030e030_corr_ratio.txt"/>
+
+			<Item Name="elecID_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_CutBased_Tight_ID.root"/>
+
+			<Item Name="elecGsf_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2016/egammaEffi.txt_EGM2D_RecEff_Moriond17.root"/>
+			<Item Name="btag_wp"         Value="CSVM"/>
+
+			
+			<!-- <Item Name="use_sframe_weight" Value="true"/> -->
+			<Item Name="use_sframe_weight"  Value="false"/>
+
+			<Item Name="ttag_wp"        Value="mr030_wp1"/>
+
+			<Item Name="store_PDF_weights" Value="true"/>
+			<Item Name="blind_DATA" Value="true"/>
+			<Item Name="AnalysisModule" Value="TTbarLJTriggerStudyLiteModule"/>
+		</UserConfig>
+
+	</Cycle>
+</JobConfiguration>

@@ -6,16 +6,18 @@
 <!ENTITY KEYW "T1_v01">
 <!ENTITY btag_workpoint "CSVM">
 <!ENTITY channel "elec">
+<!-- <!ENTITY channel "muon"> -->
 <!ENTITY NEVT            "-1">
 <!ENTITY IS_PUPPI        "true">
-<!ENTITY TargetLumi      "41529">
+<!ENTITY TargetLumi      "41557">
+<!-- <!ENTITY TargetLumi      "36734"> -->
 <!ENTITY b_Cacheable     "False">
 
 
-<!ENTITY HLT  "Ele50_CaloIdVT_GsfTrkIdT_PFJet165">
-<!ENTITY HLT2 "Ele115_CaloIdVT_GsfTrkIdT">
-<!-- <!ENTITY HLT  "Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned"> -->
-<!-- <!ENTITY HLT2  "AK8PFJet400"> -->
+<!-- <!ENTITY HLT  "Ele50_CaloIdVT_GsfTrkIdT_PFJet165"> -->
+<!-- <!ENTITY HLT2 "Ele115_CaloIdVT_GsfTrkIdT"> -->
+<!ENTITY HLT  "Ele40_WPTight_Gsf">
+<!ENTITY HLT2  "PFHT500_PFMET100_PFMHT100_IDTight">
 <!ENTITY HLT3 "NULL">
 <!ENTITY HLT4 "NULL"> 
 <!ENTITY HLT5 "NULL"> 
@@ -34,7 +36,7 @@
 <!ENTITY HLT_tag2  "NULL">
 <!ENTITY HLT_tag3  "NULL">
 
-<!ENTITY OUTdir "/nfs/dust/cms/user/xuan/Zprime_102X/">
+<!ENTITY OUTdir "/nfs/dust/cms/user/xuan/Zprime_102X/Ele40_2017/">
 
 
 <!-- <!ENTITY RSGluon_M4000_2017   SYSTEM   "../../common/datasets/RunII_102X_v1/2017/MC_RSGluonToTT_M-4000_2017.xml">
@@ -57,17 +59,19 @@
 
 
 
-
+<!-- <!ENTITY MC_TTTo2L2Nu_2017  SYSTEM  "../../common/datasets/RunII_102X_v1/2018/MC_TTTo2L2Nu.xml"> -->
 <!ENTITY MC_TTTo2L2Nu_2017  SYSTEM  "../../common/datasets/RunII_102X_v1/2017/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8.xml">
 
-
+<!ENTITY MC_TTToSemiLeptonic_2017  SYSTEM  "../../common/datasets/RunII_102X_v1/2017/MC_TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8.xml">
+<!ENTITY MC_TT_Mtt-700to1000_2017  SYSTEM  "../../common/datasets/RunII_102X_v1/2017/MC_TT_Mtt-700to1000.xml">
+<!ENTITY MC_TT_Mtt-1000toInf_2017  SYSTEM  "../../common/datasets/RunII_102X_v1/2017/MC_TT_Mtt-1000toInf.xml">
 
 
 ]>
 
 <!--
 <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="10" AutoResubmit="100"/>
-<ConfigSGE RAM="2" DISK="2" Mail="xuan@fnal.gov" Notification="as" Workdir="workdir_Zprime_PreSelec_2017_ourtrigger"/>
+<ConfigSGE RAM="2" DISK="2" Mail="xuan@fnal.gov" Notification="as" Workdir="workdir_Zprime_PreSelec_2017_ele_ht500"/>
 -->
 
 <JobConfiguration JobName="TTbarLJAnalysisLiteJob" OutputLevel="INFO">
@@ -76,36 +80,37 @@
 
 	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="&TargetLumi;">
 
-	   <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017B" Cacheable="&b_Cacheable;"> -->
-           <!--    &DATA_SingleMuon_Run2017B; -->
-           <!--    <InputTree Name="AnalysisTree" /> -->
-           <!--    <OutputTree Name="AnalysisTree" /> -->
-           <!--  </InputData> -->
+	   <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017B" Cacheable="&b_Cacheable;">
+              &DATA_SingleMuon_Run2017B;
+              <InputTree Name="AnalysisTree" />
+              <OutputTree Name="AnalysisTree" />
+            </InputData>
 
 
-	    <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017C" Cacheable="&b_Cacheable;"> -->
-	    <!--   &DATA_SingleMuon_Run2017C; -->
-	    <!--   <InputTree Name="AnalysisTree" /> -->
-	    <!--   <OutputTree Name="AnalysisTree" /> -->
-	    <!-- </InputData> -->
+	    <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017C" Cacheable="&b_Cacheable;">
+	      &DATA_SingleMuon_Run2017C;
+	      <InputTree Name="AnalysisTree" />
+	      <OutputTree Name="AnalysisTree" />
+	    </InputData>
 
-	    <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017D" Cacheable="&b_Cacheable;"> -->
-	    <!--   &DATA_SingleMuon_Run2017D; -->
-	    <!--   <InputTree Name="AnalysisTree" /> -->
-	    <!--   <OutputTree Name="AnalysisTree" /> -->
-	    <!-- </InputData> -->
+	    <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017D" Cacheable="&b_Cacheable;">
+	      &DATA_SingleMuon_Run2017D;
+	      <InputTree Name="AnalysisTree" />
+	      <OutputTree Name="AnalysisTree" />
+	    </InputData>
 
-	    <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017E" Cacheable="&b_Cacheable;"> -->
-	    <!--   &DATA_SingleMuon_Run2017E; -->
-	    <!--   <InputTree Name="AnalysisTree" /> -->
-	    <!--   <OutputTree Name="AnalysisTree" /> -->
-	    <!-- </InputData> -->
+	    <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017E" Cacheable="&b_Cacheable;">
+	      &DATA_SingleMuon_Run2017E;
+	      <InputTree Name="AnalysisTree" />
+	      <OutputTree Name="AnalysisTree" />
+	    </InputData>
 
-	    <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017F" Cacheable="&b_Cacheable;"> -->
-	    <!--   &DATA_SingleMuon_Run2017F; -->
-	    <!--   <InputTree Name="AnalysisTree" /> -->
-	    <!--   <OutputTree Name="AnalysisTree" /> -->
-	    <!-- </InputData> -->
+	    <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2017F" Cacheable="&b_Cacheable;">
+	      &DATA_SingleMuon_Run2017F;
+	      <InputTree Name="AnalysisTree" />
+	      <OutputTree Name="AnalysisTree" />
+	    </InputData>
+
 
 
 	 <InputData Lumi="7428080.259" NEventsMax="&NEVT;" Type="MC" Version="MC_TTTo2L2Nu_2017" Cacheable="&b_Cacheable;">
@@ -113,6 +118,25 @@
             <InputTree Name="AnalysisTree" />
             <OutputTree Name="AnalysisTree" />
           </InputData>
+
+	 <!-- <InputData Lumi="35279949.78" NEventsMax="&NEVT;" Type="MC" Version="MC_TTToSemiLeptonic_2017" Cacheable="&b_Cacheable;"> -->
+         <!--    &MC_TTToSemiLeptonic_2017; -->
+         <!--    <InputTree Name="AnalysisTree" /> -->
+         <!--    <OutputTree Name="AnalysisTree" /> -->
+         <!--  </InputData> -->
+
+	 <!-- <InputData Lumi="344133424.1" NEventsMax="&NEVT;" Type="MC" Version="MC_TT_Mtt-700to1000_2017" Cacheable="&b_Cacheable;"> -->
+         <!--    &MC_TT_Mtt-700to1000_2017; -->
+         <!--    <InputTree Name="AnalysisTree" /> -->
+         <!--    <OutputTree Name="AnalysisTree" /> -->
+         <!--  </InputData> -->
+
+         <!-- <InputData Lumi="655059383" NEventsMax="&NEVT;" Type="MC" Version="MC_TT_Mtt-1000toInf_2017" Cacheable="&b_Cacheable;"> -->
+         <!--    &MC_TT_Mtt-1000toInf_2017; -->
+         <!--    <InputTree Name="AnalysisTree" /> -->
+         <!--    <OutputTree Name="AnalysisTree" /> -->
+         <!--  </InputData> -->
+
 
 
 		<UserConfig>
@@ -123,14 +147,15 @@
 			<!-- <Item Name="TauCollection"           Value="slimmedTaus"/> -->
 			<Item Name="JetCollection"           Value="jetsAk4Puppi"/>
 			<Item Name="GenJetCollection"        Value="slimmedGenJets"/> 
-			<Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/>
+			<!-- <Item Name="TopJetCollection"        Value="jetsAk8CHSSubstructure_SoftDropCHS"/> -->
 
 			<Item Name="GenTopJetCollection"     Value="genjetsAk8SubstructureSoftDrop"/> <!-- Check odinary ak8GenJetsFat !--> <!-- new in ntuples! -->
 			<Item Name="TopPuppiJetCollection"   Value="jetsAk8PuppiSubstructure_SoftDropPuppi"/>
 			<Item Name="METName"                 Value="slimmedMETsPuppi"/>
 			<Item Name="genMETName"              Value="slimmedMETs_GenMET"/>
 
-			<Item Name="lumi_file" Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2017/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.root"/>
+			<!-- <Item Name="lumi_file" Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2017/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1.root"/> -->
+			<Item Name="lumi_file" Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2017/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON_v1_wonormTag.root"/>
 			<Item Name="lumihists_lumi_per_bin" Value="500.0"/>
 
 			<Item Name="is_puppi" Value="&IS_PUPPI;"/>
@@ -163,7 +188,9 @@
 			<Item Name="muonHLT_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2017/MuonTrigger_EfficienciesAndSF_RunBtoF_Nov17Nov2017.root"/>
 
 			<Item Name="muonHLT_SF_directory"  Value="Mu50_PtEtaBins/"/>
+			<!-- <Item Name="muonHLT_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/MuonHLT_EfficienciesAndSF_NoIso_average_RunBtoF.root"/> -->
 
+                        <!-- <Item Name="muonHLT_SF_directory"  Value="ID_SF_NUM_TightID_DEN_genTracks_PAR_pt_eta_id/"/> -->
 
 
 			<Item Name="elecID_SF_file"  Value="/nfs/dust/cms/user/xuan/Zprime_102X/CMSSW_10_2_10/src/UHH2/common/data/2017/2017_ElectronTight.root"/>
@@ -172,8 +199,8 @@
 			<Item Name="btag_wp"         Value="CSVM"/>
 
 			
-			<!-- <Itemc Name="use_sframe_weight" Value="true"/> -->
-
+			<!-- <Item Name="use_sframe_weight" Value="true"/> -->
+			<Item Name="use_sframe_weight"  Value="false"/>
 
 			<Item Name="ttag_wp"        Value="mr030_wp1"/>
 

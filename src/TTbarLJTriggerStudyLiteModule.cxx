@@ -107,7 +107,7 @@ class TTbarLJTriggerStudyLiteModule : public ModuleBASE {
   std::unique_ptr<uhh2::AnalysisModule> pileupSF;
   std::unique_ptr<uhh2::AnalysisModule> muonID_SF;
   std::unique_ptr<uhh2::AnalysisModule> muonHLT_SF;
-  //  std::unique_ptr<uhh2::AnalysisModule> muonTRK_SF;
+  std::unique_ptr<uhh2::AnalysisModule> muonTRK_SF;
   std::unique_ptr<uhh2::AnalysisModule> elecID_SF;
   std::unique_ptr<uhh2::AnalysisModule> elecGsf_SF;
 
@@ -204,9 +204,9 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
 
   jet2_pt  = 50.; 
   //  jet2_pt  = 30.; 
-  //  MET      =  50.;
-  MET      =  120.;
-  //  HT_lep   = 150.;  //used the value from the 2016 analysis note, might need to change it later
+  // MET      =  75.;
+  MET      =  100.;
+  HT_lep   = 150.;  //used the value from the 2016 analysis note, might need to change it later
 
 
   //// COMMON MODULES
@@ -467,8 +467,8 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   const std::string& tag_trigger2 = ctx.get("tag_trigger2", "NULL");
   if(tag_trigger2 != "NULL") tag_trigger2_sel.reset(new TriggerSelection(tag_trigger2));
   else  tag_trigger2_sel.reset(new uhh2::AndSelection(ctx));
-  const std::string& tag_trigger3 = ctx.get("tag_trigger3", "NULL");
-  if(tag_trigger3 != "NULL") tag_trigger3_sel.reset(new TriggerSelection(tag_trigger3));
+  const std::string& tag_trigger3 = ctx.get("tag_trigger3", "NULL"); 
+ if(tag_trigger3 != "NULL") tag_trigger3_sel.reset(new TriggerSelection(tag_trigger3));
   else  tag_trigger3_sel.reset(new uhh2::AndSelection(ctx));
   std::cout<<"tag_trigger = "<<tag_trigger<<" tag_trigger2 = "<<tag_trigger2<<std::endl;
   std::cout<<"probe_trigger = "<<trigger<<" probe_trigger2 = "<<trigger2<<" probe_trigger3 = "<<trigger3<<" probe_trigger4 = "<<trigger4<<" probe_trigger5 = "<<trigger5<<" probe_trigger6 = "<<trigger6<<std::endl;
@@ -481,32 +481,30 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
 
   LumiWeight_module.reset(new MCLumiWeight(ctx));
   PUWeight_module.reset(new MCPileupReweight(ctx));
-  //data_lumi = ctx.get("dataset_lumi");
-  //  target_lumi = ctx.get("target_lumi");
 
-  //  cout << "dataset lumi " << ctx.get("dataset_lumi")<< endl;
-  //  cout << "target lumi " << ctx.get("target_lumi")<< endl;
 
   
   // btag 
   CSVBTag::wp btag_wp = CSVBTag::WP_TIGHT; // b-tag workingpoint
   JetId id_btag = CSVBTag(btag_wp);
   //  sel_1btag.reset(new NJetSelection(1, 1, id_btag));
-  sel_1btag.reset(new NJetSelection(1,1, id_btag));
+  sel_1btag.reset(new NJetSelection(1,-1, id_btag));
   sel_2btag.reset(new NJetSelection(2,-1, id_btag));
 
   
   //// HISTS
   std::vector<std::string> htags_1({
         "nosel",
-	  "pileup",
+	"pileup",
 	"dilep",
+	  "jec",
 	"twodcut",
 	"jet2",
 	"jet1",
-	  //	"btag2",
-	  //	"btag1",
+	  //	  "btag2",
+	  //	  "btag1",
 	"met",
+	  //	  "htlep",
 	"tag",
 	"tagNprobe",
   });
@@ -544,7 +542,7 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   const std::string& muonHLT_directory   = ctx.get("muonHLT_SF_directory");
 
   // // muon-TRK
-  //  const std::string& muonTRK_SFac   = ctx.get("muonTRK_SF_file");
+  const std::string& muonTRK_SFac   = ctx.get("muonTRK_SF_file");
 
 
   // elec-ID
@@ -557,12 +555,13 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   ctx.undeclare_all_event_output();
 
   //pileup (define it after undeclaring all other variables to keep the weights in the output)
-  //  pileupSF.reset(new MCPileupReweight(ctx));
+  pileupSF.reset(new MCPileupReweight(ctx));
 
   //muon scale factors
   muonID_SF.reset(new MCMuonScaleFactor(ctx, muonID_SFac, muonID_directory, 1.0, "ID"));
+  //  muonHLT_SF.reset(new MCMuonScaleFactor(ctx, muonHLT_SFac, muonHLT_directory, 1.0, "HLT"));
   muonHLT_SF.reset(new MCMuonScaleFactor(ctx, muonHLT_SFac, muonHLT_directory, 0.5, "HLT"));
-  //  muonTRK_SF.reset(new MCMuonTrkScaleFactor(ctx, muonTRK_SFac, 0.0, "TRK"));
+  muonTRK_SF.reset(new MCMuonTrkScaleFactor(ctx, muonTRK_SFac, 0.0, "TRK"));
 
   //electron scale factors
   elecID_SF.reset(new MCElecScaleFactor(ctx, elecID_SFac, 0.0, "ID"));
@@ -592,10 +591,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   //  const bool jet_n = (event.jets->size() >= 2);
   //  if (!jet_n) return false;
 
-  //  cout << "dataset lumi " << data_lumi<< endl;
-  //  cout << "target lumi " << target_lumi<< endl;
 
-  //  event.weight = 1;
 
   HFolder("nosel")->fill(event);
   if(event.isRealData) lumihists_nosel->fill(event);
@@ -621,13 +617,11 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
 
     if(!lumi_sel->passes(event)) return false;
   }
-  //  cout << "event weight " << event.weight<< endl;
 
   //// Data/MC scale factors
-  //  cout << "event weight before" << event.weight<< endl;
+
   //lumi and pileup
   LumiWeight_module->process(event);
-  //event.weight = 58827/53077886.47;
   PUWeight_module->process(event);
   HFolder("pileup")->fill(event);
   //cout << "event weight after" << event.weight<< endl;
@@ -635,11 +629,11 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   //  cout << "event weight " << event.weight<< endl;
 
   //pileup
-  //  pileupSF->process(event);
+  pileupSF->process(event);
 
   // // // b-tagging
   // // btagSF->process(event);
-  //  double w_after_pileup = event.weight;
+
   
   //// LEPTON SELECTION
   muoSR_cleaner->process(event);
@@ -653,14 +647,16 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   // muon SFs
   muonID_SF->process(event);//***
   muonHLT_SF->process(event);//***
-  //  muonTRK_SF->process(event);
+
+
+  muonTRK_SF->process(event);
 
   // elec SFs
   elecID_SF->process(event);//***
   elecGsf_SF->process(event); //***
 
   
-  //  HFolder("btag2")->fill(event);
+
   //di-lepton selection
   bool pass_dilep(0);
   pass_dilep = (event.muons->size()==1) && (event.electrons->size()==1) && (event.muons->at(0).charge()!=event.electrons->at(0).charge());  //electron-muon
@@ -671,23 +667,27 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   //veto for 2018
   if(is2018){
     if(event.isRealData){
-      for(const auto& ele : *event.electrons){
-	if ((ele.v4().eta() > -2.4) && (ele.v4().eta() < -1.2)) return false;
-      }
-      for(const auto& jet : *event.jets){
-	if ((jet.v4().eta() > -2.4) && (jet.v4().eta() < -1.2)) return false;
+      if (event.run <319007){ 
+	for(const auto& ele : *event.electrons){
+	  if (((ele.v4().eta() > -2.4) && (ele.v4().eta() < -1.2)) && ((ele.v4().phi() > -1.57) && (ele.v4().phi() < -0.67)) ) {return false;}
+	}
+	for(const auto& jet : *event.jets){
+	  if (((jet.v4().eta() > -2.4) && (jet.v4().eta() < -1.2)) && ((jet.v4().phi() > -1.57) && (jet.v4().phi() < -0.67))) {return false;}
+	}
       }
     }
     else{
       for(const auto& ele : *event.electrons){
-	if ((ele.v4().eta() > -2.4) && (ele.v4().eta() < -1.2)) event.weight = event.weight*0.35;
+  	if (((ele.v4().eta() > -2.4) && (ele.v4().eta() < -1.2)) && ((ele.v4().phi() > -1.57) && (ele.v4().phi() < -0.67))) {event.weight = event.weight*0.35;}
       }
       for(const auto& jet : *event.jets){
-	if ((jet.v4().eta() > -2.4) && (jet.v4().eta() < -1.2)) event.weight = event.weight*0.35;
+  	if (((jet.v4().eta() > -2.4) && (jet.v4().eta() < -1.2)) && ((jet.v4().phi() > -1.57) && (jet.v4().phi() < -0.67))) {event.weight = event.weight*0.35;}
       }
 
     }
   }
+  
+
 
 
   if(!pass_dilep) return false;
@@ -695,7 +695,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   HFolder("dilep")->fill(event);
   if(event.isRealData) lumihists_dilep->fill(event);
 
-  //  if(event.electrons->at(0).Class()==3) return false;//HFolder("class3")->fill(event);
+
   if(event.electrons->at(0).Class()==4) return false;//TEST veto gap electrons  
 
   // // //// JET selection
@@ -797,29 +797,26 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
    jet_corrector_MC->process(event);
    if(jetER_smearer.get()){
 
-     jetER_smearer->process(event);
+      jetER_smearer->process(event);
    }
    
-   jet_corrector_MC->correct_met(event);
+     jet_corrector_MC->correct_met(event);
 
  }
 
 
-// std::cout<<" Went through JEC "<<std::endl;
+
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
 
-  //  const bool jet_n = (event.jets->size() >= 2);
-  //  if (!jet_n) return false;
 
-  //  const int 
+
   jet_n = event.jets->size();
-  //  std::cout<<"Jet N = "<<event.jets->size()<<std::endl;
   if(jet_n<2) return false;
 
   /* lepton-2Dcut variables */
 
-
+  HFolder("jec")->fill(event);
 
   const bool pass_twodcut = twodcut_sel->passes(event); {
 
@@ -848,9 +845,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   if(event.isRealData) lumihists_twodcut->fill(event);
 
 
-  //???
-  //  LumiWeight_module->process(event);
-  //  PUWeight_module->process(event);
+
 
   jet_cleaner2->process(event);                                                                                                   
   sort_by_pt<Jet>(*event.jets);
@@ -868,7 +863,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   HFolder("jet1")->fill(event);
   if(event.isRealData) lumihists_jet1->fill(event);
   
-  // //btag
+  // // //btag
   // if(!sel_2btag->passes(event)) return false;
   // HFolder("btag2")->fill(event);
 
@@ -883,24 +878,34 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   if(event.isRealData) lumihists_met->fill(event);
 
 
+  // const bool pass_htlep = htlep_sel->passes(event);
+  // if(!pass_htlep) return false;
+  // HFolder("htlep")->fill(event);
+
   //  cout << "event weight " << event.weight<< endl;
   //tag trigger
   bool pass_tag_trigger=false; bool pass_tag_trigger2=false; bool pass_tag_trigger3=false;
   pass_tag_trigger = tag_trigger_sel->passes(event);
   pass_tag_trigger2 = tag_trigger2_sel->passes(event);
   pass_tag_trigger3 = tag_trigger3_sel->passes(event);
-  //  if(event.run>=274953) pass_tag_trigger2 = tag_trigger2_sel->passes(event);
-  //  else pass_tag_trigger2=false;//TkMu50 becomes available after 274953
 
-  //if(!pass_tag_trigger && !pass_tag_trigger2 && !pass_tag_trigger3) return false;
-  if(!pass_tag_trigger) return false; //TEST
-  //if(!pass_tag_trigger && !pass_tag_trigger2) return false; 
+  if(is2018){
+    if(!pass_tag_trigger && !pass_tag_trigger2 && !pass_tag_trigger3) return false;
+  }
+  if(is2017){
+    if(!pass_tag_trigger) return false; 
+  }
+
+  if(is2016v2 || is2016v3){
+    if (event.run > 274953){
+      if(!pass_tag_trigger && !pass_tag_trigger2) return false; 
+    }
+    else {
+      if(!pass_tag_trigger) return false;
+    }
+  }
   HFolder("tag")->fill(event);
-  //  double w_after = event.weight;
-  //  std::cout<<" event.weight = "<<event.weight<<std::endl;
-  // std::cout<<" event.weight [AFTER Pile-up]/[BEFORE] = "<<100.*(w_after_pileup/w_before)<<std::endl;
-  // std::cout<<" event.weight [AFTER lep SFs]/[BEFORE] = "<<100.*(w_after_lepSFs/w_before)<<std::endl;
-  // std::cout<<" event.weight [AFTER]/[BEFORE] = "<<100.*(w_after/w_before)<<std::endl;
+
   if(event.isRealData) lumihists_tag->fill(event);
 
 
@@ -925,8 +930,9 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   //  if(!pass_trigger && !pass_trigger2 && !pass_trigger3) return false;//TEST
   //  std::cout<<"pass_tag_trigger = "<<pass_tag_trigger<<" pass_trigger = "<<pass_trigger<<std::endl;
   //  if(!pass_trigger) return false;//TEST with one trigger
+
   if(!pass_trigger && !pass_trigger2) return false;
-  //if(!pass_trigger && !pass_trigger2 && !pass_trigger3) return false;
+
   HFolder("tagNprobe")->fill(event);
   if(event.isRealData) lumihists_probe->fill(event);
 

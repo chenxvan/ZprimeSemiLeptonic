@@ -6,15 +6,18 @@
 <!ENTITY KEYW "T1_v01">
 <!ENTITY btag_workpoint "CSVM">
 <!ENTITY channel "elec">
-<!ENTITY NEVT            "1000">
+<!ENTITY NEVT            "-1">
 <!ENTITY IS_PUPPI        "true">
-<!ENTITY TargetLumi      "41529">
+<!ENTITY TargetLumi      "58827">
+<!-- <!ENTITY TargetLumi      "28827"> -->
 <!ENTITY b_Cacheable     "False">
 
 
 <!ENTITY HLT  "Ele50_CaloIdVT_GsfTrkIdT_PFJet165">
-<!ENTITY HLT2 "Ele115_CaloIdVT_GsfTrkIdT"> 
-<!ENTITY HLT3 "NULL">
+<!ENTITY HLT2 "Ele115_CaloIdVT_GsfTrkIdT">
+<!-- <!ENTITY HLT  "Ele40_WPTight_Gsf"> -->
+<!-- <!ENTITY HLT2 "PFHT500_PFMET100_PFMHT100_IDTight"> -->
+<!ENTITY HLT3 "Ele40_WPTight_Gsf">
 <!ENTITY HLT4 "NULL"> 
 <!ENTITY HLT5 "NULL"> 
 <!ENTITY HLT6 "NULL">
@@ -32,7 +35,7 @@
 <!ENTITY HLT_tag2  "TkMu100">
 <!ENTITY HLT_tag3  "OldMu100">
 
-<!ENTITY OUTdir "/nfs/dust/cms/user/xuan/Zprime_102X/">
+<!ENTITY OUTdir "/nfs/dust/cms/user/xuan/Zprime_102X/Ele40_HT500_2019/">
 
 
 <!-- <!ENTITY RSGluon_M4000_2017   SYSTEM   "../../common/datasets/RunII_102X_v1/2017/MC_RSGluonToTT_M-4000_2017.xml">
@@ -62,10 +65,10 @@
 
 ]>
 
-<!--
-<ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="10" AutoResubmit="100"/>
-<ConfigSGE RAM="2" DISK="2" Mail="xuan@fnal.gov" Notification="as" Workdir="workdir_Zprime_PreSelec_2018_ourtrigger"/>
--->
+<!--                                                                                                                       
+ <ConfigParse NEventsBreak="0" LastBreak="0" FileSplit="10" AutoResubmit="100"/>                                          
+ <ConfigSGE RAM="2" DISK="2" Mail="xuan@fnal.gov" Notification="as" Workdir="workdir_Zprime_PreSelec_2018_real"/>
+ -->
 
 <JobConfiguration JobName="TTbarLJAnalysisLiteJob" OutputLevel="INFO">
 	<Library Name="libSUHH2ZprimeSemiLeptonic"/>
@@ -74,36 +77,37 @@
 	<Cycle Name="uhh2::AnalysisModuleRunner" OutputDirectory="&OUTdir;/" PostFix="" TargetLumi="&TargetLumi;">
 
 
+<!-- Lumi="336939.1825" -->
 
-
-	 <InputData Lumi="336939.1825" NEventsMax="&NEVT;" Type="MC" Version="MC_TTTo2L2Nu_2018" Cacheable="&b_Cacheable;">
+	 <InputData Lumi="53077886.47" NEventsMax="&NEVT;" Type="MC" Version="MC_TTTo2L2Nu_2018" Cacheable="&b_Cacheable;">
             &MC_TTTo2L2Nu_2018;
             <InputTree Name="AnalysisTree" />
             <OutputTree Name="AnalysisTree" />
           </InputData>
-	 <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018A" Cacheable="&b_Cacheable;"> -->
-         <!--   &DATA_SingleMuon_Run2018A; -->
-         <!--   <InputTree Name="AnalysisTree" /> -->
-         <!--   <OutputTree Name="AnalysisTree" /> -->
-         <!--   </InputData> -->
 
-	 <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018B" Cacheable="&b_Cacheable;"> -->
-	 <!--   &DATA_SingleMuon_Run2018B; -->
-	 <!--   <InputTree Name="AnalysisTree" /> -->
-	 <!--   <OutputTree Name="AnalysisTree" /> -->
-	 <!--   </InputData> -->
+	 <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018A" Cacheable="&b_Cacheable;">
+           &DATA_SingleMuon_Run2018A;
+           <InputTree Name="AnalysisTree" />
+           <OutputTree Name="AnalysisTree" />
+           </InputData>
 
-	 <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018C" Cacheable="&b_Cacheable;"> -->
-	 <!--   &DATA_SingleMuon_Run2018C; -->
-	 <!--   <InputTree Name="AnalysisTree" /> -->
-	 <!--   <OutputTree Name="AnalysisTree" /> -->
-	 <!--   </InputData> -->
+	 <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018B" Cacheable="&b_Cacheable;">
+	   &DATA_SingleMuon_Run2018B;
+	   <InputTree Name="AnalysisTree" />
+	   <OutputTree Name="AnalysisTree" />
+	   </InputData>
 
-	 <!-- <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018D" Cacheable="&b_Cacheable;"> -->
-	 <!--   &DATA_SingleMuon_Run2018D; -->
-	 <!--   <InputTree Name="AnalysisTree" /> -->
-	 <!--   <OutputTree Name="AnalysisTree" /> -->
-	 <!--   </InputData> -->
+	 <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018C" Cacheable="&b_Cacheable;">
+	   &DATA_SingleMuon_Run2018C;
+	   <InputTree Name="AnalysisTree" />
+	   <OutputTree Name="AnalysisTree" />
+	   </InputData>
+
+	 <InputData Lumi="1" NEventsMax="&NEVT;" Type="DATA" Version="DATA_SingleMuon_Run2018D" Cacheable="&b_Cacheable;">
+	   &DATA_SingleMuon_Run2018D;
+	   <InputTree Name="AnalysisTree" />
+	   <OutputTree Name="AnalysisTree" />
+	   </InputData>
 
 
 		<UserConfig>
@@ -163,11 +167,11 @@
 			<Item Name="btag_wp"         Value="CSVM"/>
 
 			
-			<!-- <Itemc Name="use_sframe_weight" Value="true"/> -->
-
+			<Item Name="use_sframe_weight" Value="false"/>
+			<Item Name="Sys_PU"             Value="central"/>
 
 			<Item Name="ttag_wp"        Value="mr030_wp1"/>
-
+			
 			<Item Name="store_PDF_weights" Value="true"/>
 			<Item Name="blind_DATA" Value="true"/>
 			<Item Name="AnalysisModule" Value="TTbarLJTriggerStudyLiteModule"/>
