@@ -78,7 +78,7 @@ class TTbarLJTriggerStudyLiteModule : public ModuleBASE {
   std::unique_ptr<ElectronCleaner> eleSR_cleaner;
   //  ElectronId eleID = ElectronID_Spring15_25ns_tight_noIso;
   ElectronId eleID =   ElectronID_Fall17_tight_noIso; //check OLD version
-  //  ElectronId eleID = ElectronID_Spring16_medium_noIso;         // MVA version of Zprime
+  //  ElectronId eleID = ElectronID_Summer16_medium_noIso;         // MVA version of Zprime
   //  ElectronId eleID = ElectronID_MVAGeneralPurpose_Spring16_loose; //Cut-based version of Zprime
   std::unique_ptr<JetCleaner>                      jet_IDcleaner;
   //  std::unique_ptr<JetCorrector>                    jet_corrector, jet_corrector_BCD, jet_corrector_EFearly, jet_corrector_FlateG, jet_corrector_H;
@@ -475,7 +475,7 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
   met_sel  .reset(new METCut  (MET   , uhh2::infinity));
   htlep_sel.reset(new HTlepCut(HT_lep, uhh2::infinity));
   twodcut_sel.reset(new TwoDCutALL(0.4, 20.)); //may need to change
-  // twodcut_sel.reset(new TwoDCut1(0.4, 20.));
+
   //???
   //  Sys_PU = ctx.get("Sys_PU");
 
@@ -485,11 +485,11 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
 
   
   // btag 
-  CSVBTag::wp btag_wp = CSVBTag::WP_TIGHT; // b-tag workingpoint
-  JetId id_btag = CSVBTag(btag_wp);
-  //  sel_1btag.reset(new NJetSelection(1, 1, id_btag));
-  sel_1btag.reset(new NJetSelection(1,-1, id_btag));
-  sel_2btag.reset(new NJetSelection(2,-1, id_btag));
+  // CSVBTag::wp btag_wp = CSVBTag::WP_TIGHT; // b-tag workingpoint
+  // JetId id_btag = CSVBTag(btag_wp);
+  // //  sel_1btag.reset(new NJetSelection(1, 1, id_btag));
+  // sel_1btag.reset(new NJetSelection(1,-1, id_btag));
+  // sel_2btag.reset(new NJetSelection(2,-1, id_btag));
 
   
   //// HISTS
@@ -559,7 +559,6 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
 
   //muon scale factors
   muonID_SF.reset(new MCMuonScaleFactor(ctx, muonID_SFac, muonID_directory, 1.0, "ID"));
-  //  muonHLT_SF.reset(new MCMuonScaleFactor(ctx, muonHLT_SFac, muonHLT_directory, 1.0, "HLT"));
   muonHLT_SF.reset(new MCMuonScaleFactor(ctx, muonHLT_SFac, muonHLT_directory, 0.5, "HLT"));
   muonTRK_SF.reset(new MCMuonTrkScaleFactor(ctx, muonTRK_SFac, 0.0, "TRK"));
 
@@ -588,8 +587,7 @@ TTbarLJTriggerStudyLiteModule::TTbarLJTriggerStudyLiteModule(uhh2::Context& ctx)
 bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   int jet_n = event.jets->size();
   if(jet_n<2) return false;
-  //  const bool jet_n = (event.jets->size() >= 2);
-  //  if (!jet_n) return false;
+  
 
 
 
@@ -648,9 +646,9 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   muonID_SF->process(event);//***
   muonHLT_SF->process(event);//***
 
-
-  muonTRK_SF->process(event);
-
+   if(is2016v2 || is2016v3){
+     muonTRK_SF->process(event);
+   }
   // elec SFs
   elecID_SF->process(event);//***
   elecGsf_SF->process(event); //***
@@ -740,7 +738,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
     
 
 
-    //    if(apply_A+apply_B+apply_C+apply_D+apply_E+apply_F+apply_G+apply_H != 1) throw std::runtime_error("In ZprimePreselectionModule.cxx: Sum of apply_* when applying JECs is not == 1. Fix this.");
+    if(apply_A+apply_B+apply_C+apply_D+apply_E+apply_F+apply_G+apply_H != 1) throw std::runtime_error("In ZprimePreselectionModule.cxx: Sum of apply_* when applying JECs is not == 1. Fix this.");
 
 
 
@@ -882,7 +880,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   // if(!pass_htlep) return false;
   // HFolder("htlep")->fill(event);
 
-  //  cout << "event weight " << event.weight<< endl;
+
   //tag trigger
   bool pass_tag_trigger=false; bool pass_tag_trigger2=false; bool pass_tag_trigger3=false;
   pass_tag_trigger = tag_trigger_sel->passes(event);
@@ -902,7 +900,7 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
     }
     else {
       if(!pass_tag_trigger) return false;
-    }
+         }
   }
   HFolder("tag")->fill(event);
 
@@ -923,12 +921,12 @@ bool TTbarLJTriggerStudyLiteModule::process(uhh2::Event& event){
   // pass_trigger5 = trigger5_sel->passes(event);
   // pass_trigger6 = trigger6_sel->passes(event);
   // if(pass_trigger2 || pass_trigger3 || pass_trigger4 || pass_trigger5 || pass_trigger6)
-  //   std::cout<<"pass_trigger2 || pass_trigger3 || pass_trigger4 || pass_trigger5 || pass_trigger6 "<<std::endl;
-  //  if(pass_trigger6)  std::cout<<"pass_trigger6 = "<<pass_trigger6<<std::endl;
+
+
   //  if(!pass_trigger && !pass_trigger2 && !pass_trigger3 && !pass_trigger4 && !pass_trigger5 && !pass_trigger6) return false;
   //  if(!pass_trigger && !pass_trigger2 && !pass_trigger3 && !pass_trigger6) return false;//TEST
   //  if(!pass_trigger && !pass_trigger2 && !pass_trigger3) return false;//TEST
-  //  std::cout<<"pass_tag_trigger = "<<pass_tag_trigger<<" pass_trigger = "<<pass_trigger<<std::endl;
+
   //  if(!pass_trigger) return false;//TEST with one trigger
 
   if(!pass_trigger && !pass_trigger2) return false;
