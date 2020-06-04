@@ -24,6 +24,7 @@
 #include <UHH2/common/include/ElectronHists.h>
 #include <UHH2/common/include/JetHists.h>
 #include <UHH2/common/include/EventHists.h>
+#include <UHH2/common/include/CommonModules.h>
 
 #include <UHH2/ZprimeSemiLeptonic/include/ModuleBASE.h>
 #include <UHH2/ZprimeSemiLeptonic/include/ZprimeSemiLeptonicSelections.h>
@@ -45,6 +46,8 @@ public:
 protected:
 
   // Corrections
+  std::unique_ptr<CommonModules>   common;
+
   std::unique_ptr<JetCorrector>                    jet_corrector_A,jet_corrector_B, jet_corrector_C, jet_corrector_D, jet_corrector_E, jet_corrector_F, 
     jet_corrector_G,jet_corrector_H, jet_corrector_MC;
   std::unique_ptr<TopJetCorrector>                 topjet_corrector_A,topjet_corrector_B, topjet_corrector_C, topjet_corrector_D,topjet_corrector_E, topjet_corrector_F, 
@@ -62,7 +65,7 @@ protected:
   std::unique_ptr<JetLeptonCleaner_by_KEYmatching> TopJLC_puppi_A, TopJLC_puppi_B, TopJLC_puppi_C, TopJLC_puppi_D,TopJLC_puppi_E, TopJLC_puppi_F,
     TopJLC_puppi_G, TopJLC_puppi_H, TopJLC_puppi_MC;
 
-  std::unique_ptr<GenericJetResolutionSmearer>     JER_smearer;
+  //  std::unique_ptr<GenericJetResolutionSmearer>     JER_smearer;
   std::unique_ptr<GenericJetResolutionSmearer>     TopJER_smearer;
   std::unique_ptr<GenericJetResolutionSmearer>     TopJER_puppi_smearer;
 
@@ -159,6 +162,7 @@ void ZprimePreselectionModule::init_JEC_JLC(uhh2::Context& ctx){
   std::vector<std::string> JEC_AK8Puppi_A, JEC_AK8Puppi_B, JEC_AK8Puppi_C, JEC_AK8Puppi_D, JEC_AK8Puppi_E, JEC_AK8Puppi_F, JEC_AK8Puppi_G, JEC_AK8Puppi_H;
 
   if(!is2017 && !is2018 && !is2016v2 && !is2016v3) cout<<"Hm, some is wrong. Did you mention year in Version parameter of xml file?"<<endl;
+  //still need by the top jet jec
   if(is2016v2 || is2016v3){
     cout<<"ZprimePreselectionModule uses JEC for 2016 data/MC"<<endl;
     JEC_AK4CHS_B       = JERFiles::Summer16_07Aug2017_V11_B_L123_AK4PFchs_DATA;
@@ -234,7 +238,7 @@ void ZprimePreselectionModule::init_JEC_JLC(uhh2::Context& ctx){
     JEC_AK8Puppi_H = JERFiles::Summer16_07Aug2017_V11_L1fix_H_L123_AK8PFPuppi_DATA;
     JEC_AK8Puppi_MC = JERFiles::Summer16_07Aug2017_V11_L1fix_L123_AK8PFPuppi_MC;
     */
-  }
+      }
 
   if(is2017){
     cout<<"ZprimePreselectionModule uses JEC for 2017 data/MC"<<endl;
@@ -292,72 +296,8 @@ void ZprimePreselectionModule::init_JEC_JLC(uhh2::Context& ctx){
     JEC_AK8Puppi_D = JERFiles::Autumn18_V8_D_L123_AK8PFPuppi_DATA;
     JEC_AK8Puppi_MC = JERFiles::Autumn18_V8_L123_AK8PFPuppi_MC;
   }
-  cout<<"And now read JECs"<<endl;
 
- if(!ispuppi){
-   if(is2018) jet_corrector_A.reset(new JetCorrector(ctx, JEC_AK4CHS_A));
-    jet_corrector_B.reset(new JetCorrector(ctx, JEC_AK4CHS_B));
-    jet_corrector_C.reset(new JetCorrector(ctx, JEC_AK4CHS_C));
-    jet_corrector_D.reset(new JetCorrector(ctx, JEC_AK4CHS_D));
-    if(is2017 or is2016v2 or is2016v3){
-      //      jet_corrector_D.reset(new JetCorrector(ctx, JEC_AK4CHS_D));//tmp
-      jet_corrector_E.reset(new JetCorrector(ctx, JEC_AK4CHS_E));
-      jet_corrector_F.reset(new JetCorrector(ctx, JEC_AK4CHS_F));
-      if(is2016v2 or is2016v3){
-	jet_corrector_G.reset(new JetCorrector(ctx, JEC_AK4CHS_G));
-	jet_corrector_H.reset(new JetCorrector(ctx, JEC_AK4CHS_H));
-      }
-    }
-    jet_corrector_MC.reset(new JetCorrector(ctx,            JEC_AK4CHS_MC));
 
-    //Jet-lepton cleaning
-    if(is2018) JLC_A.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_A));
-    JLC_B.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_B));
-    JLC_C.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_C));
-    JLC_D.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_D));
-    if(is2017 or is2016v2 or is2016v3){
-      //  JLC_D.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_D));//tmp
-      JLC_E.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_E));
-      JLC_F.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_F));
-      if(is2016v2 or is2016v3){
-	JLC_G.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_G));
-	JLC_H.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4CHS_H));
-      }
-    }
-    JLC_MC.reset(new JetLeptonCleaner_by_KEYmatching(ctx,            JEC_AK4CHS_MC));
- }
-  else{
-    if(is2018) jet_corrector_A.reset(new JetCorrector(ctx, JEC_AK4Puppi_A));
-    jet_corrector_B.reset(new JetCorrector(ctx, JEC_AK4Puppi_B));
-    jet_corrector_C.reset(new JetCorrector(ctx, JEC_AK4Puppi_C));
-    jet_corrector_D.reset(new JetCorrector(ctx, JEC_AK4Puppi_D));
-    if(is2017 or is2016v2 or is2016v3){
-      //  jet_corrector_D.reset(new JetCorrector(ctx, JEC_AK4Puppi_D));//tmp
-      jet_corrector_E.reset(new JetCorrector(ctx, JEC_AK4Puppi_E));
-      jet_corrector_F.reset(new JetCorrector(ctx, JEC_AK4Puppi_F));
-      if(is2016v2 or is2016v3){
-	jet_corrector_G.reset(new JetCorrector(ctx, JEC_AK4Puppi_G));
-	jet_corrector_H.reset(new JetCorrector(ctx, JEC_AK4Puppi_H));
-      }
-    }
-    jet_corrector_MC.reset(new JetCorrector(ctx, JEC_AK4Puppi_MC));
-
-    //Jet-lepton cleaning
-    if(is2018) JLC_A.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_A));
-    JLC_B.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_B));
-    JLC_C.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_C));
-    JLC_D.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_D));
-    if(is2017 or is2016v2 or is2016v3){
-      //  JLC_D.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_D));//tmp
-      JLC_E.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_E));
-      JLC_F.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_F));
-      if(is2016v2 or is2016v3){
-	JLC_G.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_G));
-	JLC_H.reset(new JetLeptonCleaner_by_KEYmatching(ctx, JEC_AK4Puppi_H));
-      }
-    }
-    JLC_MC.reset(new JetLeptonCleaner_by_KEYmatching(ctx,            JEC_AK4Puppi_MC));
-  }
   cout<<"And now read top JECs"<<endl;
   if(is2018) topjet_corrector_A.reset(new TopJetCorrector(ctx,       JEC_AK8CHS_A));
   topjet_corrector_B.reset(new TopJetCorrector(ctx,       JEC_AK8CHS_B));
@@ -480,13 +420,15 @@ ZprimePreselectionModule::ZprimePreselectionModule(uhh2::Context& ctx){
     muID      = MuonID(Muon::CutBasedIdGlobalHighPt);
   }
   if(is2016v2 || is2016v3){
-    eleID = ElectronID_Summer16_tight_noIso;//ToDo: compare cutBased without iso and MVA-based via wp in UHH2
-    muID      = MuonID(Muon::Highpt);
+    //eleID = ElectronID_Summer16_tight_noIso;//ToDo: compare cutBased without iso and MVA-based via wp in UHH2
+    //muID      = MuonID(Muon::Highpt);
+    eleID = ElectronID_Summer16_medium_noIso;
+    muID  = MuonID(Muon::CutBasedIdTight); // see more muonIDs https://github.com/cms-sw/cmssw/blob/master/DataFormats/MuonReco/interface/Muon.h#L201
   }
   double electron_pt(50.);
   double muon_pt(55.);
   double jet1_pt(50.);
-  double jet2_pt(30.);
+  double jet2_pt(20.);
   double MET(50.);
 
   // COMMON MODULES
@@ -546,25 +488,24 @@ ZprimePreselectionModule::ZprimePreselectionModule(uhh2::Context& ctx){
   if(isMC){
     //    ctx.declare_event_input<std::vector<Particle> >(ctx.get("TopJetCollectionGEN"), "topjetsGEN");
     if(is2016v2 || is2016v3){
-      if(!ispuppi) JER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Summer16_25nsV1, "2016/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt"));
-      else JER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Summer16_25nsV1, "2016/Summer16_25nsV1_MC_PtResolution_AK4PFPuppi.txt"));
+
       TopJER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "gentopjets", JERSmearing::SF_13TeV_Summer16_25nsV1, "2016/Summer16_25nsV1_MC_PtResolution_AK8PFchs.txt"));
       TopJER_puppi_smearer.reset(new GenericJetResolutionSmearer(ctx, "toppuppijets", "gentopjets", JERSmearing::SF_13TeV_Summer16_25nsV1, "2016/Summer16_25nsV1_MC_PtResolution_AK8PFPuppi.txt"));
     }
+    
     if(is2017){
-      if(!ispuppi) JER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Fall17_V3, "2017/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
-      else JER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Fall17_V3, "2017/Fall17_V3_MC_PtResolution_AK4PFPuppi.txt"));
+
       TopJER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "gentopjets", JERSmearing::SF_13TeV_Fall17_V3, "2017/Fall17_V3_MC_PtResolution_AK8PFchs.txt"));
       TopJER_puppi_smearer.reset(new GenericJetResolutionSmearer(ctx, "toppuppijets", "gentopjets", JERSmearing::SF_13TeV_Fall17_V3, "2017/Fall17_V3_MC_PtResolution_AK8PFPuppi.txt"));
     }
-    /* Was NOT used yet, 2017 JER SFs were used in previous 2018 iteration!
+    
+    // Was NOT used yet, 2017 JER SFs were used in previous 2018 iteration!
     if(is2018){
-      if(!ispuppi) JER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Autumn18_RunABCD_V4, "2018/Autumn18_V4_MC_PtResolution_AK4PFchs.txt"));
-      else JER_smearer.reset(new GenericJetResolutionSmearer(ctx, "jets", "genjets", JERSmearing::SF_13TeV_Autumn18_RunABCD_V4, "2018/Autumn18_V4_MC_PtResolution_AK4PFPuppi.txt"));
+
       TopJER_smearer.reset(new GenericJetResolutionSmearer(ctx, "topjets", "gentopjets", JERSmearing::SF_13TeV_Autumn18_RunABCD_V4, "2018/Autumn18_V4_MC_PtResolution_AK8PFchs.txt"));
       TopJER_puppi_smearer.reset(new GenericJetResolutionSmearer(ctx, "toppuppijets", "gentopjets", JERSmearing::SF_13TeV_Autumn18_RunABCD_V4, "2018/Autumn18_V4_MC_PtResolution_AK8PFPuppi.txt"));
     }
-    */
+    
   }
 
 
@@ -572,6 +513,20 @@ ZprimePreselectionModule::ZprimePreselectionModule(uhh2::Context& ctx){
   jet1_sel.reset(new NJetSelection(1, -1, JetId(PtEtaCut(jet1_pt, 2.4))));
   jet2_sel.reset(new NJetSelection(2, -1, JetId(PtEtaCut(jet2_pt, 2.4))));
   met_sel  .reset(new METCut  (MET   , uhh2::infinity));
+
+  /// common module for JEC, JLC, etc
+  common.reset(new CommonModules());
+  common->switch_jetlepcleaner(true);
+  common->disable_mcpileupreweight();
+  common->disable_mclumiweight();
+  common->disable_lumisel();
+  common->disable_metfilters();
+  common->disable_pvfilter();
+  common->disable_jetpfidfilter();
+  common->switch_jetPtSorter(false);
+  common->switch_metcorrection(true);
+  common->init(ctx);
+
 
 
   // Book histograms
@@ -667,124 +622,112 @@ bool ZprimePreselectionModule::process(uhh2::Event& event){
 
     //apply proper JECs
     if(apply_A){
-      JLC_A->process(event);
+
       TopJLC_A->process(event);
       TopJLC_puppi_A->process(event);
-      jet_corrector_A->process(event);
+
       topjet_corrector_A->process(event);
       topjet_puppi_corrector_A->process(event);
-      jet_corrector_A->correct_met(event);
+
       topjet_subjet_corrector_A->process(event);
       topjet_puppi_subjet_corrector_A->process(event);
     }
     if(apply_B){
-      JLC_B->process(event);
+
       TopJLC_B->process(event);
       TopJLC_puppi_B->process(event);
-      jet_corrector_B->process(event);
+
       topjet_corrector_B->process(event);
       topjet_puppi_corrector_B->process(event);
-      jet_corrector_B->correct_met(event);
+
       topjet_subjet_corrector_B->process(event);
       topjet_puppi_subjet_corrector_B->process(event);
     }
     if(apply_C){
-      JLC_C->process(event);
+
       TopJLC_C->process(event);
       TopJLC_puppi_C->process(event);
-      jet_corrector_C->process(event);
+
       topjet_corrector_C->process(event);
       topjet_puppi_corrector_C->process(event);
-      jet_corrector_C->correct_met(event);
+
       topjet_subjet_corrector_C->process(event);
       topjet_puppi_subjet_corrector_C->process(event);
     }
     if(apply_D){
-      JLC_D->process(event);
+
       TopJLC_D->process(event);
       TopJLC_puppi_D->process(event);
-      jet_corrector_D->process(event);
+
       topjet_corrector_D->process(event);
       topjet_puppi_corrector_D->process(event);
-      jet_corrector_D->correct_met(event);
+
       topjet_subjet_corrector_D->process(event);
       topjet_puppi_subjet_corrector_D->process(event);
     }
     if(apply_E){
-      JLC_E->process(event);
+
       TopJLC_E->process(event);
       TopJLC_puppi_E->process(event);
-      jet_corrector_E->process(event);
+
       topjet_corrector_E->process(event);
       topjet_puppi_corrector_E->process(event);
-      jet_corrector_E->correct_met(event);
+
       topjet_subjet_corrector_E->process(event);
       topjet_puppi_subjet_corrector_E->process(event);
     }
     if(apply_F){
-      JLC_F->process(event);
+
       TopJLC_F->process(event);
       TopJLC_puppi_F->process(event);
-      jet_corrector_F->process(event);
+
       topjet_corrector_F->process(event);
       topjet_puppi_corrector_F->process(event);
-      jet_corrector_F->correct_met(event);
+
       topjet_subjet_corrector_F->process(event);
       topjet_puppi_subjet_corrector_F->process(event);
     }    
     if(apply_G){
-      JLC_G->process(event);
+
       TopJLC_G->process(event);
       TopJLC_puppi_G->process(event);
-      jet_corrector_G->process(event);
+
       topjet_corrector_G->process(event);
       topjet_puppi_corrector_G->process(event);
-      jet_corrector_G->correct_met(event);
+
       topjet_subjet_corrector_G->process(event);
       topjet_puppi_subjet_corrector_G->process(event);
     }
     if(apply_H){
-      JLC_H->process(event);
+
       TopJLC_H->process(event);
       TopJLC_puppi_H->process(event);
-      jet_corrector_H->process(event);
+
       topjet_corrector_H->process(event);
       topjet_puppi_corrector_H->process(event);
-      jet_corrector_H->correct_met(event);
+
       topjet_subjet_corrector_H->process(event);
       topjet_puppi_subjet_corrector_H->process(event);
     }
   }
   else{ //MC
-    //    cout<<"JLC, JEC, JER ..."<<endl;
-    JLC_MC->process(event);
-    //    cout<<"  JLC_MC done!"<<endl;
+
     TopJLC_MC->process(event);
-    //    cout<<"  TopJLC_MC done!"<<endl;
     TopJLC_puppi_MC->process(event);
 
-    jet_corrector_MC->process(event);
-    //    cout<<" jet_corrector_MC done!"<<endl;
+
     topjet_corrector_MC->process(event);
-    //    cout<<" topjet_corrector_MC done!"<<endl;
     topjet_puppi_corrector_MC->process(event);
-    //    cout<<" topjet_puppi_corrector_MC done!"<<endl;
-    if(JER_smearer.get()){
-      //      cout<<" Start JER_smearer "<<endl;
-      JER_smearer->process(event);
-    }
-    //    cout<<" JER_smearer done!"<<endl;
+
     if(TopJER_smearer.get()) TopJER_smearer->process(event);
-    // cout<<" TopJER_smearer done!"<<endl;
     if(TopJER_puppi_smearer.get()) TopJER_puppi_smearer->process(event);
-    // cout<<" TopJER_puppi_smearer done!"<<endl;
-    jet_corrector_MC->correct_met(event);
-    // cout<<" jet_corrector_MC done!"<<endl;
+
     topjet_subjet_corrector_MC->process(event);
-    // cout<<" topjet_subjet_corrector_MC done!"<<endl;
     topjet_puppi_subjet_corrector_MC->process(event);
-    // cout<<" topjet_puppi_subjet_corrector_MC done!"<<endl;
+
   }
+
+  if(!common->process(event)) return false;
 
   jet_cleaner1->process(event);
   sort_by_pt<Jet>(*event.jets);
