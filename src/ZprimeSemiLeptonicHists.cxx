@@ -381,6 +381,12 @@ void ZprimeSemiLeptonicHists::init(){
   M_Zprime_dr_rebin2       = book<TH1F>("M_Zprime_dr_rebin2", "M_{t#bar{t}} (correctly matched) [GeV]", 70, 0, 7000);
   M_Zprime_dr_rebin3       = book<TH1F>("M_Zprime_dr_rebin3", "M_{t#bar{t}} (correctly matched) [GeV]", 35, 0, 7000);
 
+  //  M_tophad_dr_ak4_rebin          = book<TH1F>("M_tophad_dr_ak4_rebin", "M_{t}^{had, AK4} (correctly matched) [GeV]", 120, 0, 350);
+  //  M_toplep_dr_ak4_rebin          = book<TH1F>("M_toplep_dr_ak4_rebin", "M_{t}^{lep, AK4} (correctly matched) [GeV]", 120, 0, 350);
+  //  M_tophad_dr_ttag_rebin         = book<TH1F>("M_tophad_dr_ttag_rebin", "M_{t}^{had, top-tag} (correctly matched) [GeV]", 120, 0, 350);
+  //  M_toplep_dr_ttag_rebin         = book<TH1F>("M_toplep_dr_ttag_rebin", "M_{t}^{lep, top-tag} (correctly matched) [GeV]", 120, 0, 350);
+
+
   // Sphericity tensor
   S11 = book<TH1F>("S11", "S_{11}", 50, 0, 1);
   S12 = book<TH1F>("S12", "S_{12}", 50, 0, 1);
@@ -974,10 +980,18 @@ void ZprimeSemiLeptonicHists::fill(const Event & event){
       if(BestZprimeCandidate->is_toptag_reconstruction()){
         M_tophad_dr_ttag->Fill(BestZprimeCandidate->tophad_topjet_ptr()->softdropmass(), weight);
         M_toplep_dr_ttag->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+
+	//	M_tophad_dr_ttag_rebin->Fill(BestZprimeCandidate->tophad_topjet_ptr()->softdropmass(), weight);
+	//        M_toplep_dr_ttag_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+
       }
       else{
         M_tophad_dr_ak4->Fill(inv_mass(BestZprimeCandidate->top_hadronic_v4()), weight);
         M_toplep_dr_ak4->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+
+	//	M_tophad_dr_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_hadronic_v4()), weight);
+	//	M_toplep_dr_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+
       }
       dr_discr_Zprime->Fill(dr, weight);
       M_Zprime_dr->Fill(Mreco, weight);

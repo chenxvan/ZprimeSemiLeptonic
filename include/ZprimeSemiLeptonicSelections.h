@@ -18,17 +18,6 @@
 
 namespace uhh2 {
 
-  ///adding it from the old release, not sure if we still need it                                                              
-  class HTlepCut : public Selection {
-  public:
-    explicit HTlepCut(float, float max_htlep=infinity);
-    virtual bool passes(const Event&) override;
-
-  private:
-    float min_htlep_, max_htlep_;
-  };
-  /////
-
 
 
   class BlindDataSelection : public Selection{
@@ -64,13 +53,18 @@ namespace uhh2 {
     uhh2::Event::Handle<bool> h_is_zprime_reconstructed_correctmatch;
   };
 
+  
   class TTbarSemiLepMatchableSelection: public uhh2::Selection{
   public:
     TTbarSemiLepMatchableSelection();
     ~TTbarSemiLepMatchableSelection(){};
     virtual bool passes(const uhh2::Event & event);
+    std::pair<bool,double> check_reco(const ReconstructionHypothesis hyp);//compares match between reconstructed hypothesis vs gen tops and products of their decays filled in passes()
   private:
+    GenParticle Wlep, Whad, blep, bhad, thad, tlep, lepton, neutrino, Whadd1,Whadd2;
   };
+
+
 
   class Chi2Cut : public Selection{
   public:
@@ -92,6 +86,17 @@ namespace uhh2 {
   private:
     float min_, max_;
   };
+
+  class HTlepCut : public Selection {
+    
+  public:
+    explicit HTlepCut(float, float max_htlep=infinity);
+    virtual bool passes(const Event&) override;
+
+  private:
+    float min_htlep_, max_htlep_;
+  };
+  ////
 
   class METCut : public Selection {
 
@@ -115,15 +120,15 @@ namespace uhh2 {
   };
   ////
 
-  /* class TwoDCut1 : public Selection { */
+  class TwoDCut1 : public Selection {
 
-  /* public: */
-  /*   explicit TwoDCut1(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {} */
-  /*   virtual bool passes(const Event&) override; */
+  public:
+    explicit TwoDCut1(float min_deltaR, float min_pTrel): min_deltaR_(min_deltaR), min_pTrel_(min_pTrel) {}
+    virtual bool passes(const Event&) override;
 
-  /* private: */
-  /*   float min_deltaR_, min_pTrel_; */
-  /* }; */
+  private:
+    float min_deltaR_, min_pTrel_;
+  };
   ////
 
   class TwoDCutALL : public Selection {
