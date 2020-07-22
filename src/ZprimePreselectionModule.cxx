@@ -424,8 +424,8 @@ bool ZprimePreselectionModule::process(uhh2::Event& event){
   //  cout<<"JetID ... "<<event.event<<endl;
 
   // Common module JEC, JLC, lumi, etc 
-  common->process(event);
-  //if(!common->process(event)) return false;
+  //common->process(event);
+  if(!common->process(event)) return false;
   
   //Topjet
   if(isMC){
