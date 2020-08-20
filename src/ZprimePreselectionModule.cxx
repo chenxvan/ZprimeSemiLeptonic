@@ -371,7 +371,7 @@ ZprimePreselectionModule::ZprimePreselectionModule(uhh2::Context& ctx){
   common->disable_mcpileupreweight();
   //  common->disable_mclumiweight();
   //  common->disable_lumisel();
-  //  common->disable_metfilters();
+  common->disable_metfilters();
   common->disable_pvfilter();
   common->disable_jetpfidfilter();
   common->switch_jetPtSorter(false);
