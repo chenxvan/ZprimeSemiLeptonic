@@ -96,11 +96,10 @@ TTbarSemiLepMatchableSelection::TTbarSemiLepMatchableSelection(){
   Wlep = GenParticle(); Whad = GenParticle();
   blep =  GenParticle(); bhad = GenParticle();
   thad =  GenParticle(); tlep =  GenParticle();
-  lepton =  GenParticle(); neutrino =  GenParticle(); 
+  lepton =  GenParticle(); neutrino =  GenParticle();
   Whadd1 =  GenParticle(); Whadd2 =  GenParticle();
-}
+}  
 bool TTbarSemiLepMatchableSelection::passes(const Event & event){
-  // For pdgID mapping see https://twiki.cern.ch/twiki/bin/view/Main/PdgId
   if(event.isRealData) return false;
   assert(event.genparticles);
 
@@ -132,7 +131,7 @@ bool TTbarSemiLepMatchableSelection::passes(const Event & event){
           }
         }
       }
-      if(abs(b->pdgId()) != 5 && abs(b->pdgId()) != 3 && abs(b->pdgId()) != 1) {//b,s,d
+      if(abs(b->pdgId()) != 5 && abs(b->pdgId()) != 3 && abs(b->pdgId()) != 1) {
         for(unsigned int j = 0; j < event.genparticles->size(); ++j) {
           const GenParticle & genp = event.genparticles->at(j);
           auto m1 = genp.mother(event.genparticles, 1);
@@ -171,16 +170,16 @@ bool TTbarSemiLepMatchableSelection::passes(const Event & event){
       if(!matched_b_ak4 && !matched_b_ak8) return false;
 
       //Check decaymodes of W
-    
+
       //hadronic
       if(fabs(Wd1->pdgId()) < 7 && fabs(Wd2->pdgId()) < 7){
         if(found_had) return false;
         found_had = true;
-	Whad = *W;
-	bhad = *b;
-	thad = gp;
-	Whadd1 = *Wd1;
-	Whadd2 = *Wd2;
+        Whad = *W;
+        bhad = *b;
+        thad = gp;
+        Whadd1 = *Wd1;
+        Whadd2 = *Wd2;
         //check if both daughters can be matched by jets
         bool matched_d1_ak4 = false, matched_d2_ak4 = false;
         bool matched_d1_ak8 = false, matched_d2_ak8 = false;
@@ -200,6 +199,7 @@ bool TTbarSemiLepMatchableSelection::passes(const Event & event){
           if(deltaR(*Wd2, event.topjets->at(idx_matched_topjet)) <= 0.8) matched_d2_ak8 = true;
         }
 
+        // if(!(matched_d1 && matched_d2)) return false;
         if(!(matched_b_ak4 && matched_d1_ak4 && matched_d2_ak4) && !(matched_b_ak8 && matched_d1_ak8 && matched_d2_ak8)) return false;
       }
 
@@ -238,7 +238,6 @@ bool TTbarSemiLepMatchableSelection::passes(const Event & event){
             }
             idx++;
           }
-	  //          if(!found_lep) cout<<"!!! Not found leptonic side";
           if(!found_lep) return false;
         }
 
@@ -252,22 +251,22 @@ bool TTbarSemiLepMatchableSelection::passes(const Event & event){
           nu = Wd1;
         }
         if(!(abs(lep->pdgId()) == 11 && abs(nu->pdgId()) == 12) && !(abs(lep->pdgId()) == 13 && abs(nu->pdgId()) == 14)) throw runtime_error("In TTbarSemiLepMatchable: The leptonic W does not decay into a lepton and its neutrino.");
-	Wlep = *W;
-	blep = *b;
-	tlep = gp;
-	lepton = *lep;
-	neutrino = *nu;
+        Wlep = *W;
+        blep = *b;
+        tlep = gp;
+        lepton = *lep;
+        neutrino = *nu;
 
         //check, if lepton can be matched
         bool matched_lep = false;
         if(fabs(lep->pdgId()) == 11){
           for(const auto & ele : *event.electrons){
-            if(deltaR(*lep,ele) <= 0.2) matched_lep = true;
+            if(deltaR(*lep,ele) <= 0.1) matched_lep = true;
           }
         }
         else if(fabs(lep->pdgId()) == 13){
           for(const auto & mu : *event.muons){
-            if(deltaR(mu,*lep) <= 0.2) matched_lep = true;
+            if(deltaR(mu,*lep) <= 0.1) matched_lep = true;
           }
         }
         else throw runtime_error("In TTbarSemiLepMatchable: Lepton from W decay is neither e nor mu.");
@@ -357,13 +356,13 @@ std::pair<bool,double> TTbarSemiLepMatchableSelection::check_reco(const Reconstr
   // //  cout<<"dR_top_lep_reco_gen ="<<dR_top_lep_reco_gen<<" dR_top_had_reco_gen = "<<dR_top_had_reco_gen<<endl;
   // //  cout<<" dR_lep_reco_gen = "<<dR_lep_reco_gen<<endl;
   // if(dR_top_lep_reco_gen>0.4 || dR_top_had_reco_gen>0.4) return false;
- 
-  
+
+
   // if(deltaM_lep>1 || deltaM_had>1) return false;
   // return true;
 }
 
-//////////////////////////////////
+////////////////////////////////////////////////////////////////
 
 uhh2::Chi2Cut::Chi2Cut(Context& ctx, float min, float max): min_(min), max_(max){
   h_BestZprimeCandidate = ctx.get_handle<ZprimeCandidate*>("ZprimeCandidateBestChi2");
@@ -383,6 +382,29 @@ bool uhh2::Chi2Cut::passes(const uhh2::Event& event){
 
   return pass;
 }
+////////////////////////////////////////////////////////////////////
+uhh2::InvChi2Cut::InvChi2Cut(Context& ctx, float min): min_(min){
+  h_BestZprimeCandidate = ctx.get_handle<ZprimeCandidate*>("ZprimeCandidateBestChi2");
+  h_is_zprime_reconstructed = ctx.get_handle<bool>("is_zprime_reconstructed_chi2");
+}
+
+bool uhh2::InvChi2Cut::passes(const uhh2::Event& event){
+
+  bool is_zprime_reconstructed = event.get(h_is_zprime_reconstructed);
+ 
+  bool pass = false;
+  if(is_zprime_reconstructed){
+    ZprimeCandidate* BestZprimeCandidate = event.get(h_BestZprimeCandidate);
+    double chi2 = BestZprimeCandidate->discriminator("chi2_total");
+    if(chi2 >= min_ ) pass = true;
+  }
+
+  return pass;
+}
+////////////////////////////////////////////////////////////////////
+
+
+
 
 uhh2::STlepPlusMetCut::STlepPlusMetCut(float min, float max):
 min_(min), max_(max) {}
@@ -504,4 +526,44 @@ bool uhh2::GenFlavorSelection::passes(const uhh2::Event& event){
   //  std::cout<<"bottomN = "<<bottomN<<" charmN = "<<charmN<<std::endl;
 
   return pass;
+
 }
+////////////////////////////////////////////////////////
+
+HEMSelection::HEMSelection(Context& ctx){
+year = extract_year(ctx);
+}
+bool HEMSelection::passes(const Event & event){
+
+if(year != Year::is2018) return true;
+if( (event.isRealData && event.run >= min_runnum) || (!event.isRealData) ){
+
+   for(const Electron & ele : *event.electrons){
+      if ( ele.eta() < eta_up && ele.eta() > eta_down && ele.phi() < phi_up && ele.phi() > phi_down) return false;
+   }
+
+   for(const Muon & muo : *event.muons){
+      if ( muo.eta() < eta_up && muo.eta() > eta_down && muo.phi() < phi_up && muo.phi() > phi_down) return false;
+   }
+
+   for(const auto & jet : *event.jets){
+      if ( jet.eta() < eta_up && jet.eta() > eta_down && jet.phi() < phi_up && jet.phi() > phi_down) return false;
+   }
+
+   for(const auto & topjet : *event.topjets){
+      if ( topjet.eta() < eta_up && topjet.eta() > eta_down && topjet.phi() < phi_up && topjet.phi() > phi_down) return false;
+   }
+
+   for(const auto & toppuppijet : *event.toppuppijets){
+      if ( toppuppijet.eta() < eta_up && toppuppijet.eta() > eta_down && toppuppijet.phi() < phi_up && toppuppijet.phi() > phi_down) return false;
+   }
+} 
+return true;
+}
+
+/////////////////////////////////////////////////////
+
+
+
+
+

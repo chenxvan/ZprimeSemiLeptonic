@@ -481,7 +481,8 @@ bool ZprimeCorrectMatchDiscriminator::process(uhh2::Event& event){
       continue;
     }
 
-    if((!is_toptag_reconstruction && jets_had.size() > 3) || (is_toptag_reconstruction && jets_had.size() != 1)){
+    if((!is_toptag_reconstruction && jets_had.size() > 2) || (is_toptag_reconstruction && jets_had.size() != 1)){ //need to be changed
+      //if((!is_toptag_reconstruction && jets_had.size() > 3) || (is_toptag_reconstruction && jets_had.size() != 1)){
       candidates.at(i).set_discriminators("correct_match", 9999999);
       // cout << "Not right amount of hadronic jets" << endl;
       continue;
@@ -505,7 +506,7 @@ bool ZprimeCorrectMatchDiscriminator::process(uhh2::Event& event){
 
       // Match hadronic b-quark
       dr = match_dr(ttbargen.BHad(), jets_had, idx);
-      if(dr > 0.3){
+      if(dr > 0.3){ //should be 0.3
         candidates.at(i).set_discriminators("correct_match", 9999999);
         // cout << "Not hadronic b-quark matched (AK4)" << endl;
         continue;
@@ -516,7 +517,7 @@ bool ZprimeCorrectMatchDiscriminator::process(uhh2::Event& event){
       //match quarks from W decays to jets
       // First
       dr = match_dr(ttbargen.Q1(), jets_had, idx);
-      if(dr > 0.3){
+      if(dr > 0.3){ //should be 0.3
         candidates.at(i).set_discriminators("correct_match", 9999999);
         // cout << "Not had Q1 matched (AK4)" << endl;
         continue;
@@ -526,7 +527,7 @@ bool ZprimeCorrectMatchDiscriminator::process(uhh2::Event& event){
 
       // Second
       dr = match_dr(ttbargen.Q2(), jets_had, idx);
-      if(dr > 0.3){
+      if(dr > 0.3){ //should be 0.3
         candidates.at(i).set_discriminators("correct_match", 9999999);
         // cout << "Not had Q2 matched (AK4)" << endl;
         continue;
@@ -534,11 +535,13 @@ bool ZprimeCorrectMatchDiscriminator::process(uhh2::Event& event){
       correct_dr += dr;
       if(idx >= 0) n_matched++;
 
-      if(n_matched != jets_had.size()){
-        candidates.at(i).set_discriminators("correct_match", 9999999);
-        // cout << "Not number of jets and matched equal" << endl;
-        continue;
-      }
+
+      //need to uncomment
+      // if(n_matched != jets_had.size()){
+      //   candidates.at(i).set_discriminators("correct_match", 9999999);
+      //   // cout << "Not number of jets and matched equal" << endl;
+      //   continue;
+      // }
     }
     else{
       const TopJet* topjet = candidates.at(i).tophad_topjet_ptr();
@@ -586,6 +589,79 @@ bool ZprimeCorrectMatchDiscriminator::process(uhh2::Event& event){
   event.set(h_is_zprime_reconstructed_, true);
   return true;
 }
+
+ZprimeMatchableDiscriminator::ZprimeMatchableDiscriminator(uhh2::Context& ctx){
+
+  h_ZprimeCandidates_ = ctx.get_handle< std::vector<ZprimeCandidate> >("ZprimeCandidates");
+  h_ttbargen_ = ctx.get_handle<TTbarGen>("ttbargen");
+  h_is_zprime_reconstructed_ = ctx.get_handle< bool >("is_zprime_reconstructed_matchable");
+  h_BestCandidate_ = ctx.get_handle<ZprimeCandidate*>("ZprimeCandidateBestMatchable");
+
+  is_mc = ctx.get("dataset_type") == "MC";
+  if(is_mc) ttgenprod.reset(new TTbarGenProducer(ctx));
+}
+
+bool ZprimeMatchableDiscriminator::process(uhh2::Event& event){
+
+  if(!is_mc) return false;
+
+  // Check if event contains == 2 top quarks
+  assert(event.genparticles);
+  int n_top = 0, n_antitop = 0;
+  for(const auto & gp : *event.genparticles){
+    if(gp.pdgId() == 6) n_top++;
+    else if(gp.pdgId() == -6) n_antitop++;
+  }
+  if(n_top != 1 || n_antitop != 1) return false;
+  bool check_decay = ttgenprod->process(event);
+  if(!check_decay) return false; //FixME: sometimes decay prodcts of ttbar are not Wb+Wb. Why?
+
+  vector<ZprimeCandidate>& candidates = event.get(h_ZprimeCandidates_);
+  if(candidates.size() < 1) return false;
+
+
+  ZprimeCandidate* bestCand = &candidates.at(0);
+  TTbarGen ttbargen = event.get(h_ttbargen_);
+  for(unsigned int i=0; i<candidates.size(); i++){
+
+    bool is_toptag_reconstruction = candidates.at(i).is_toptag_reconstruction();
+
+    // Gen-Lvl ttbar has to decay semileptonically
+    if(ttbargen.DecayChannel() != TTbarGen::e_muhad && ttbargen.DecayChannel() != TTbarGen::e_ehad){
+      // cout << "Not semileptonic decay" << endl;
+      continue;
+    }
+
+    vector<Particle> jets_had = candidates.at(i).jets_hadronic();
+    vector<Particle> jets_lep = candidates.at(i).jets_leptonic();
+
+    if(jets_lep.size() != 1){
+      // cout << "Not ==1 leptonic jet" << endl;
+      continue;
+    }
+
+    if((!is_toptag_reconstruction && jets_had.size() > 3) || (is_toptag_reconstruction && jets_had.size() != 1)){
+      // cout << "Not right amount of hadronic jets" << endl;
+      continue;
+    }
+    bestCand = &candidates.at(i);
+  }
+  event.set(h_BestCandidate_, bestCand);
+  event.set(h_is_zprime_reconstructed_, true);
+  return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 AK8PuppiTopTagger::AK8PuppiTopTagger(uhh2::Context& ctx, int min_num_daughters, float max_dR, float min_mass, float max_mass, float max_tau32) : min_num_daughters_(min_num_daughters), max_dR_(max_dR), min_mass_(min_mass), max_mass_(max_mass), max_tau32_(max_tau32) {
 

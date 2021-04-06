@@ -59,6 +59,25 @@ private:
 
 };
 
+class ZprimeMatchableDiscriminator : uhh2::AnalysisModule{
+
+ public:
+  explicit ZprimeMatchableDiscriminator(uhh2::Context&);
+  virtual bool process(uhh2::Event&) override;
+
+ private:
+  uhh2::Event::Handle< std::vector<ZprimeCandidate> > h_ZprimeCandidates_;
+  uhh2::Event::Handle<TTbarGen> h_ttbargen_;
+  uhh2::Event::Handle<ZprimeCandidate*> h_BestCandidate_;
+  uhh2::Event::Handle<bool> h_is_zprime_reconstructed_;
+
+  bool is_mc;
+  std::unique_ptr<TTbarGenProducer> ttgenprod;
+
+};
+
+
+
 class AK8PuppiTopTagger : public uhh2::AnalysisModule {
 
 public:

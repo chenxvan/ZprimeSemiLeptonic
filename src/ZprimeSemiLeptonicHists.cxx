@@ -25,8 +25,10 @@ Hists(ctx, dirname) {
   h_AK8PuppiTopTags = ctx.get_handle<std::vector<TopJet>>("AK8PuppiTopTags");
   h_BestZprimeCandidateChi2 = ctx.get_handle<ZprimeCandidate*>("ZprimeCandidateBestChi2");
   h_BestZprimeCandidateCorrectMatch = ctx.get_handle<ZprimeCandidate*>("ZprimeCandidateBestCorrectMatch");
+  //  h_BestZprimeCandidateMatchable = ctx.get_handle<ZprimeCandidate*>("ZprimeCandidateBestMatchable");//???
   h_is_zprime_reconstructed_chi2 = ctx.get_handle<bool>("is_zprime_reconstructed_chi2");
   h_is_zprime_reconstructed_correctmatch = ctx.get_handle<bool>("is_zprime_reconstructed_correctmatch");
+  //  h_is_zprime_reconstructed_matchable = ctx.get_handle<bool>("is_zprime_reconstructed_matchable"); //???
   init();
 }
 
@@ -335,6 +337,9 @@ void ZprimeSemiLeptonicHists::init(){
   STlep_rebin2      = book<TH1F>("STlep_rebin2", "S_{T}^{lep} [GeV]", 30, 0, 1500);
   STlep_rebin3      = book<TH1F>("STlep_rebin3", "S_{T}^{lep} [GeV]", 15, 0, 1500);
 
+  //BDT
+  BDT      = book<TH1F>("BDT_Score", "BDT Score", 50, 0, 1);
+
   // Zprime reconstruction
   vector<float> bins_Zprime4 = {0,400,600,800,1000,1200,1400,1600,1800,2000,2200,2400,2600,2800,3000,3200,3400,3600,3800,4000,4400,4800,5200,5600,6000,6100};
   vector<float> bins_Zprime5 = {0,200,400,600,800,1000,1200,1400,1600,1800,2000,2200,2400,2600,2800,3000,3300,3600,3900,4200,4500,5000,5100};
@@ -381,10 +386,15 @@ void ZprimeSemiLeptonicHists::init(){
   M_Zprime_dr_rebin2       = book<TH1F>("M_Zprime_dr_rebin2", "M_{t#bar{t}} (correctly matched) [GeV]", 70, 0, 7000);
   M_Zprime_dr_rebin3       = book<TH1F>("M_Zprime_dr_rebin3", "M_{t#bar{t}} (correctly matched) [GeV]", 35, 0, 7000);
 
-  //  M_tophad_dr_ak4_rebin          = book<TH1F>("M_tophad_dr_ak4_rebin", "M_{t}^{had, AK4} (correctly matched) [GeV]", 120, 0, 350);
-  //  M_toplep_dr_ak4_rebin          = book<TH1F>("M_toplep_dr_ak4_rebin", "M_{t}^{lep, AK4} (correctly matched) [GeV]", 120, 0, 350);
-  //  M_tophad_dr_ttag_rebin         = book<TH1F>("M_tophad_dr_ttag_rebin", "M_{t}^{had, top-tag} (correctly matched) [GeV]", 120, 0, 350);
-  //  M_toplep_dr_ttag_rebin         = book<TH1F>("M_toplep_dr_ttag_rebin", "M_{t}^{lep, top-tag} (correctly matched) [GeV]", 120, 0, 350);
+  M_tophad_dr_ak4_rebin          = book<TH1F>("M_tophad_dr_ak4_rebin", "M_{t}^{had, AK4} (correctly matched) [GeV]", 120, 0, 350);
+  M_toplep_dr_ak4_rebin          = book<TH1F>("M_toplep_dr_ak4_rebin", "M_{t}^{lep, AK4} (correctly matched) [GeV]", 120, 0, 350);
+  M_tophad_dr_ttag_rebin         = book<TH1F>("M_tophad_dr_ttag_rebin", "M_{t}^{had, top-tag} (correctly matched) [GeV]", 120, 0, 350);
+  M_toplep_dr_ttag_rebin         = book<TH1F>("M_toplep_dr_ttag_rebin", "M_{t}^{lep, top-tag} (correctly matched) [GeV]", 120, 0, 350);
+
+   M_tophad_match_ak4_rebin          = book<TH1F>("M_tophad_match_ak4_rebin", "M_{t}^{had, AK4} (correctly matched) [GeV]", 120, 0, 350);
+   M_toplep_match_ak4_rebin          = book<TH1F>("M_toplep_match_ak4_rebin", "M_{t}^{lep, AK4} (correctly matched) [GeV]", 120, 0, 350);
+   M_tophad_match_ttag_rebin         = book<TH1F>("M_tophad_match_ttag_rebin", "M_{t}^{had, top-tag} (correctly matched) [GeV]", 120, 0, 350);
+   M_toplep_match_ttag_rebin         = book<TH1F>("M_toplep_match_ttag_rebin", "M_{t}^{lep, top-tag} (correctly matched) [GeV]", 120, 0, 350);
 
 
   // Sphericity tensor
@@ -523,7 +533,7 @@ void ZprimeSemiLeptonicHists::fill(const Event & event){
       N_daughters_AK8CHSjet1->Fill(AK8CHSjets->at(i).numberOfDaughters(), weight);
       tau1_AK8CHSjet1->Fill(AK8CHSjets->at(i).tau1(), weight);
       tau2_AK8CHSjet1->Fill(AK8CHSjets->at(i).tau2(), weight);
-      tau3_AK8CHSjet1->Fill(AK8CHSjets->at(i).tau3(), weight);
+       tau3_AK8CHSjet1->Fill(AK8CHSjets->at(i).tau3(), weight);
       tau21_AK8CHSjet1->Fill(tau21, weight);
       tau32_AK8CHSjet1->Fill(tau32, weight);
     }
@@ -915,9 +925,14 @@ void ZprimeSemiLeptonicHists::fill(const Event & event){
   STlep_rebin2->Fill(st_lep, weight);
   STlep_rebin3->Fill(st_lep, weight);
 
+  //BDT
+  BDT->Fill(event.bdt_score, weight);
+
   // Zprime reco
   bool is_zprime_reconstructed_chi2 = event.get(h_is_zprime_reconstructed_chi2);
   bool is_zprime_reconstructed_correctmatch = event.get(h_is_zprime_reconstructed_correctmatch);
+  //  bool is_zprime_reconstructed_matchable = event.get(h_is_zprime_reconstructed_matchable);
+
   if(is_zprime_reconstructed_chi2){
     ZprimeCandidate* BestZprimeCandidate = event.get(h_BestZprimeCandidateChi2);
     float Mreco = BestZprimeCandidate->Zprime_v4().M();
@@ -981,16 +996,16 @@ void ZprimeSemiLeptonicHists::fill(const Event & event){
         M_tophad_dr_ttag->Fill(BestZprimeCandidate->tophad_topjet_ptr()->softdropmass(), weight);
         M_toplep_dr_ttag->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
 
-	//	M_tophad_dr_ttag_rebin->Fill(BestZprimeCandidate->tophad_topjet_ptr()->softdropmass(), weight);
-	//        M_toplep_dr_ttag_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+	M_tophad_dr_ttag_rebin->Fill(BestZprimeCandidate->tophad_topjet_ptr()->softdropmass(), weight);
+	M_toplep_dr_ttag_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
 
       }
       else{
         M_tophad_dr_ak4->Fill(inv_mass(BestZprimeCandidate->top_hadronic_v4()), weight);
         M_toplep_dr_ak4->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
 
-	//	M_tophad_dr_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_hadronic_v4()), weight);
-	//	M_toplep_dr_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+	M_tophad_dr_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_hadronic_v4()), weight);
+	M_toplep_dr_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
 
       }
       dr_discr_Zprime->Fill(dr, weight);
@@ -1000,6 +1015,26 @@ void ZprimeSemiLeptonicHists::fill(const Event & event){
       M_Zprime_dr_rebin3->Fill(Mreco, weight);
     }
   }
+
+  //Test for matchable
+  
+  // if(is_zprime_reconstructed_matchable){
+
+  //   ZprimeCandidate* BestZprimeCandidate = event.get(h_BestZprimeCandidateMatchable);
+  //   //    float dr = BestZprimeCandidate->discriminator("matchable");
+  //   if(BestZprimeCandidate->is_toptag_reconstruction()){
+      
+  //     M_tophad_match_ttag_rebin->Fill(BestZprimeCandidate->tophad_topjet_ptr()->softdropmass(), weight);
+  //     M_toplep_match_ttag_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+  //     }
+  //     else{
+  // 	M_tophad_match_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_hadronic_v4()), weight);
+  // 	M_toplep_match_ak4_rebin->Fill(inv_mass(BestZprimeCandidate->top_leptonic_v4()), weight);
+  //     }
+
+  // }
+
+
 
   // Sphericity tensor
   double s11 = -1., s12 = -1., s13 = -1., s22 = -1., s23 = -1., s33 = -1., mag = -1.;

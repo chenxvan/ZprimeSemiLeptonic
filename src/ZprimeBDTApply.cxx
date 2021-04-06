@@ -51,10 +51,10 @@ using namespace uhh2;
 ██████  ███████ ██      ██ ██   ████ ██    ██    ██  ██████  ██   ████
 */
 
-class ZprimeAnalysisModule : public ModuleBASE {
+class ZprimeBDTApply : public ModuleBASE {
 
 public:
-  explicit ZprimeAnalysisModule(uhh2::Context&);
+  explicit ZprimeBDTApply(uhh2::Context&);
   virtual bool process(uhh2::Event&) override;
   void book_histograms(uhh2::Context&, vector<string>);
   void fill_histograms(uhh2::Event&, string);
@@ -114,9 +114,47 @@ protected:
 
   bool is2016v2, is2016v3, is2017v2, is2018;
   bool isMuon, isElectron;
+
+  //BDT variables                                                                                                                   
+  Event::Handle<int> h_ttagN;
+  Event::Handle<int> h_btagN;
+  Event::Handle<float> h_N_jets;
+  Event::Handle<float> h_mass_jet;
+  Event::Handle<float> h_mass_jet1;
+  Event::Handle<float> h_mass_jet2;
+  Event::Handle<float> h_ST;
+  Event::Handle<float> h_csv_jet;
+  Event::Handle<float> h_csv_jet1;
+  Event::Handle<float> h_csv_jet2;
+  Event::Handle<float> h_S33;
+  Event::Handle<float> h_dR_mu_jet;
+  Event::Handle<float> h_dRmin_mu_jet;
+  Event::Handle<float> h_dRmin_mu_jet_scaled;
+  Event::Handle<float> h_dR_ele_jet;
+  Event::Handle<float> h_dRmin_ele_jet;
+  Event::Handle<float> h_dRmin_ele_jet_scaled;
+  Event::Handle<float> h_ptrel_mu_jet;
+  Event::Handle<float> h_ptrel_ele_jet;
+  Event::Handle<float> h_deepjet_topscore_jet;
+  Event::Handle<float> h_deepjet_topscore_jet1;
+  Event::Handle<float> h_deepjet_topscore_jet2;
+  Event::Handle<float> h_deepjet_wscore_jet;
+  Event::Handle<float> h_deepjet_wscore_jet1;
+  Event::Handle<float> h_deepjet_wscore_jet2;
+  Event::Handle<float> h_deepjet_zscore_jet;
+  Event::Handle<float> h_deepjet_zscore_jet1;
+  Event::Handle<float> h_deepjet_zscore_jet2;
+  Event::Handle<float> h_deepjet_higgsscore_jet;
+  Event::Handle<float> h_deepjet_higgsscore_jet1;
+  Event::Handle<float> h_deepjet_higgsscore_jet2;
+  Event::Handle<float> h_deepjet_qcdscore_jet;
+  Event::Handle<float> h_deepjet_qcdscore_jet1;
+  Event::Handle<float> h_deepjet_qcdscore_jet2;
+
+
 };
 
-void ZprimeAnalysisModule::book_histograms(uhh2::Context& ctx, vector<string> tags){
+void ZprimeBDTApply::book_histograms(uhh2::Context& ctx, vector<string> tags){
   for(const auto & tag : tags){
     string mytag = tag + "_Skimming";
     mytag = tag+"_General";
@@ -124,7 +162,7 @@ void ZprimeAnalysisModule::book_histograms(uhh2::Context& ctx, vector<string> ta
   }
 }
 
-void ZprimeAnalysisModule::fill_histograms(uhh2::Event& event, string tag){
+void ZprimeBDTApply::fill_histograms(uhh2::Event& event, string tag){
   string mytag = tag + "_Skimming";
   mytag = tag+"_General";
   HFolder(mytag)->fill(event);
@@ -138,7 +176,7 @@ void ZprimeAnalysisModule::fill_histograms(uhh2::Event& event, string tag){
 █  ██████  ██████  ██   ████ ███████    ██    ██   ██  ██████   ██████    ██     ██████  ██   ██
 */
 
-ZprimeAnalysisModule::ZprimeAnalysisModule(uhh2::Context& ctx){
+ZprimeBDTApply::ZprimeBDTApply(uhh2::Context& ctx){
   //  debug = true;
   debug = false;
   for(auto & kv : ctx.get_all()){
@@ -303,8 +341,50 @@ ZprimeAnalysisModule::ZprimeAnalysisModule(uhh2::Context& ctx){
 
   TopJetBtagSubjet_selection.reset(new ZprimeBTagFatSubJetSelection(ctx));
 
+
+  //variables for limit                                                                                                             
+  h_ttagN = ctx.declare_event_output<int>("ttagN");
+  h_btagN = ctx.declare_event_output<int>("btagN");
+  //  h_wtagN = ctx.declare_event_output<int>("wtagN");
+
+
+  //BDT variables                                                                                                                   
+  h_N_jets = ctx.declare_event_output<float> ("N_jets");
+  h_mass_jet = ctx.declare_event_output<float> ("mass_jet");
+  h_mass_jet1 = ctx.declare_event_output<float> ("mass_jet1");
+  h_mass_jet2 = ctx.declare_event_output<float> ("mass_jet2");
+  h_ST = ctx.declare_event_output<float> ("st");
+  h_csv_jet = ctx.declare_event_output<float> ("csv_jet");
+  h_csv_jet1 = ctx.declare_event_output<float> ("csv_jet1");
+  h_csv_jet2 = ctx.declare_event_output<float> ("csv_jet2");
+  h_S33 = ctx.declare_event_output<float> ("s33");
+  h_dR_mu_jet = ctx.declare_event_output<float> ("dR_mu_jet");
+  h_dRmin_mu_jet = ctx.declare_event_output<float> ("dRmin_mu_jet");
+  h_dRmin_mu_jet_scaled = ctx.declare_event_output<float> ("dRmin_mu_jet_scaled");
+  h_dR_ele_jet = ctx.declare_event_output<float> ("dR_ele_jet");
+  h_dRmin_ele_jet = ctx.declare_event_output<float> ("dRmin_ele_jet");
+  h_dRmin_ele_jet_scaled = ctx.declare_event_output<float> ("dRmin_ele_jet_scaled");
+  h_ptrel_mu_jet = ctx.declare_event_output<float> ("ptrel_mu_jet");
+  h_ptrel_ele_jet = ctx.declare_event_output<float> ("ptrel_ele_jet");
+
+  h_deepjet_topscore_jet = ctx.declare_event_output<float> ("deepjet_topscore_jet");
+  h_deepjet_topscore_jet1 = ctx.declare_event_output<float> ("deepjet_topscore_jet1");
+  h_deepjet_topscore_jet2 = ctx.declare_event_output<float> ("deepjet_topscore_jet2");
+  h_deepjet_wscore_jet  = ctx.declare_event_output<float> ("deepjet_wscore_jet");
+  h_deepjet_wscore_jet1 = ctx.declare_event_output<float> ("deepjet_wscore_jet1");
+  h_deepjet_wscore_jet2 = ctx.declare_event_output<float> ("deepjet_wscore_jet2");
+  h_deepjet_zscore_jet = ctx.declare_event_output<float> ("deepjet_zscore_jet");
+  h_deepjet_zscore_jet1 = ctx.declare_event_output<float> ("deepjet_zscore_jet1");
+  h_deepjet_zscore_jet2 = ctx.declare_event_output<float> ("deepjet_zscore_jet2");
+  h_deepjet_higgsscore_jet = ctx.declare_event_output<float> ("deepjet_higgsscore_jet");
+  h_deepjet_higgsscore_jet1  = ctx.declare_event_output<float> ("deepjet_higgsscore_jet1");
+  h_deepjet_higgsscore_jet2 = ctx.declare_event_output<float> ("deepjet_higgsscore_jet2");
+  h_deepjet_qcdscore_jet = ctx.declare_event_output<float> ("deepjet_qcdscore_jet");
+  h_deepjet_qcdscore_jet1 = ctx.declare_event_output<float> ("deepjet_qcdscore_jet1");
+  h_deepjet_qcdscore_jet2 = ctx.declare_event_output<float> ("deepjet_qcdscore_jet2");
+
   // Book histograms
-  vector<string> histogram_tags = {"Weights", "Weights_MuonID", "Weights_PU", "Weights_Lumi", "Weights_TopPt", "Weights_MCScale", "Muon1", "TriggerMuon", "Muon2", "Electron1", "TriggerEle", "TwoDCut", "Jet1", "Jet2", "MET", "HTlep", "NNInputsBeforeReweight", "MatchableBeforeChi2Cut", "NotMatchableBeforeChi2Cut", "CorrectMatchBeforeChi2Cut", "NotCorrectMatchBeforeChi2Cut", "Chi2", "Matchable", "NotMatchable", "CorrectMatch", "NotCorrectMatch", "TopTagReconstruction", "NotTopTagReconstruction", "Btags2", "Btags1","TopJetBtagSubjet"};
+  vector<string> histogram_tags = {"Weights", "Weights_MuonID", "Weights_PU", "Weights_Lumi", "Weights_TopPt", "Weights_MCScale", "Muon1", "TriggerMuon", "Muon2", "Electron1", "TriggerEle", "TwoDCut", "Jet1", "Jet2", "MET", "HTlep", "NNInputsBeforeReweight", "MatchableBeforeChi2Cut", "NotMatchableBeforeChi2Cut", "CorrectMatchBeforeChi2Cut", "NotCorrectMatchBeforeChi2Cut", "Chi2", "Matchable", "NotMatchable", "CorrectMatch", "NotCorrectMatch", "TopTagReconstruction", "NotTopTagReconstruction", "Btags2", "Btags1","TopJetBtagSubjet", "SR_1top", "SR_0top","CR_ttbar","CR_wjet","Test_1top"};
   book_histograms(ctx, histogram_tags);
 }
 
@@ -316,7 +396,7 @@ ZprimeAnalysisModule::ZprimeAnalysisModule(uhh2::Context& ctx){
 ██      ██   ██  ██████   ██████ ███████ ███████ ███████
 */
 
-bool ZprimeAnalysisModule::process(uhh2::Event& event){
+bool ZprimeBDTApply::process(uhh2::Event& event){
 
   if(debug)   cout << "++++++++++++ NEW EVENT ++++++++++++++" << endl;
   if(debug)   cout<<" run.event: "<<event.run<<". "<<event.event<<endl;
@@ -334,6 +414,48 @@ bool ZprimeAnalysisModule::process(uhh2::Event& event){
   event.set(h_ak8jet1_eta,-100);
   event.set(h_NPV,-100);
   event.set(h_weight,-100);
+
+
+  event.set(h_ttagN,-100);
+  //  event.set(h_wtagN,-100);                                                                                                      
+  event.set(h_btagN,-100);
+
+
+  event.set(h_N_jets,0);
+  event.set(h_mass_jet,0);
+  event.set(h_mass_jet1,0);
+  event.set(h_mass_jet2,0);
+  event.set(h_ST,0);
+  event.set(h_csv_jet,0);
+  event.set(h_csv_jet1,0);
+  event.set(h_csv_jet2,0);
+  event.set(h_S33,0);
+  event.set(h_dR_mu_jet,0);
+  event.set(h_dRmin_mu_jet,0);
+  event.set(h_dRmin_mu_jet_scaled,0);
+  event.set(h_dR_ele_jet,0);
+  event.set(h_dRmin_ele_jet,0);
+  event.set(h_dRmin_ele_jet_scaled,0);
+  event.set(h_ptrel_mu_jet,0);
+  event.set(h_ptrel_ele_jet,0);
+
+  event.set(h_deepjet_topscore_jet,0);
+  event.set(h_deepjet_topscore_jet1,0);
+  event.set(h_deepjet_topscore_jet2,0);
+  event.set(h_deepjet_wscore_jet,0);
+  event.set(h_deepjet_wscore_jet1,0);
+  event.set(h_deepjet_wscore_jet2,0);
+  event.set(h_deepjet_zscore_jet,0);
+  event.set(h_deepjet_zscore_jet1,0);
+  event.set(h_deepjet_zscore_jet2,0);
+  event.set(h_deepjet_higgsscore_jet,0);
+  event.set(h_deepjet_higgsscore_jet1,0);
+  event.set(h_deepjet_higgsscore_jet2,0);
+  event.set(h_deepjet_qcdscore_jet,0);
+  event.set(h_deepjet_qcdscore_jet1,0);
+  event.set(h_deepjet_qcdscore_jet2,0);
+
+
   // Printing
   // if(!event.isRealData) printer_genparticles->process(event);
 
@@ -468,6 +590,15 @@ bool ZprimeAnalysisModule::process(uhh2::Event& event){
   else fill_histograms(event, "NotTopTagReconstruction");
   if(debug) cout<<"ZprimeTopTag_selection is ok"<<endl;
 
+  /*
+  if(event.bdt > 0.4){
+    if() fill_histograms(event, "SR_02");
+    else fill_histograms(event, "SR_01");
+  }
+  else{
+    if 
+      }    
+  */
   //Test with b-tagging
   if(sel_2btag->passes(event)) fill_histograms(event, "Btags2");
   if(sel_1btag->passes(event)) fill_histograms(event, "Btags1");
@@ -505,7 +636,162 @@ bool ZprimeAnalysisModule::process(uhh2::Event& event){
   }
   event.set(h_NPV,event.pvs->size());
   if(debug) cout<<"Set some vars for monitoring"<<endl;
+
+  //limit variables                                                                                                                 
+  //  vector<TopJet> WTags = event.get(h_AK8WTags);                                                                                 
+  //  event.set(h_wtagN,WTags.size());                                                                                              
+
+  //  vector<TopJet> TopTags = event.toppuppijets;                                                                                  
+  event.set(h_ttagN,event.toppuppijets->size());
+
+  int btagN = 0;
+  int jetbtagN = 0;
+  int btag_subjet=0;
+
+  if(event.toppuppijets->size() == 0){
+    if(sel_2btag->passes(event)) jetbtagN = jetbtagN + 2;
+    if(sel_1btag->passes(event)) jetbtagN = jetbtagN + 1;
+  }
+
+  if(event.toppuppijets->size() == 1){
+    for(auto & topjet : *event.topjets){
+      auto subjets = topjet.subjets();
+      for (auto & subjet : subjets) {
+        if(sel_1btag->passes(event)) btag_subjet++;
+      }
+
+
+      for(unsigned int j=0; j<event.jets->size(); j++){
+        double dR_jet = deltaR(topjet, event.jets->at(j));
+        if(dR_jet > 1.2) continue;
+        if(sel_1btag->passes(event)) jetbtagN++;
+      }
+    }
+  }
+
+  btagN = jetbtagN + btag_subjet;
+  event.set(h_btagN,btagN);
+
+
+  //BDT
+  event.set(h_N_jets,event.jets->size());
+  for(unsigned int i=0; i<event.jets->size(); i++){
+    event.set(h_mass_jet,event.jets->at(i).v4().M());
+    event.set(h_csv_jet,event.jets->at(i).btag_combinedSecondaryVertex());
+    if(isMuon){
+      double dRmin_muon_jet = 99999;
+      for(unsigned int j=0; j<event.muons->size(); j++){
+        double dR_mu_jet = deltaR(event.jets->at(i), event.muons->at(j));
+        if(dR_mu_jet < dRmin_muon_jet) dRmin_muon_jet = dR_mu_jet;
+        event.set(h_dR_mu_jet,dR_mu_jet);
+      }
+    }
+    if(isElectron){
+      double dRmin_ele_jet = 99999;
+      for(unsigned int j=0; j<event.electrons->size(); j++){
+        double dR_ele_jet = deltaR(event.jets->at(i), event.electrons->at(j));
+        if(dR_ele_jet < dRmin_ele_jet) dRmin_ele_jet = dR_ele_jet;
+        event.set(h_dR_ele_jet,dR_ele_jet);
+      }
+    }
+    if(i==0){
+      event.set(h_mass_jet1,event.jets->at(i).v4().M());
+      event.set(h_csv_jet1,event.jets->at(i).btag_combinedSecondaryVertex());
+    }
+
+    else if(i==1){
+      event.set(h_mass_jet2,event.jets->at(i).v4().M());
+      event.set(h_csv_jet2,event.jets->at(i).btag_combinedSecondaryVertex());
+    }
+
+  }
+
+  double st = 0., st_jets = 0., st_lep = 0.;
+
+
+  for(unsigned int i=0; i<event.jets->size(); i++){
+    st_jets += event.jets->at(i).pt();
+  }
+  for(unsigned int i=0; i<event.electrons->size(); i++){
+    st_lep += event.electrons->at(i).pt();
+  }
+  for(unsigned int i=0; i<event.muons->size(); i++){
+    st_lep += event.muons->at(i).pt();
+  }
+  st = st_jets + st_lep + event.met->pt();
+
+  event.set(h_ST,st);
+
+  double s33 = -1., mag = -1.;
+  for(const Jet jet : *event.jets){
+    mag += (jet.v4().Px()*jet.v4().Px()+jet.v4().Py()*jet.v4().Py()+jet.v4().Pz()*jet.v4().Pz());
+    s33 += jet.v4().Pz()*jet.v4().Pz();
+  }
+  s33 = s33 / mag;
+  event.set(h_S33,s33);
+
+  if(isMuon){
+
+    if(event.muons->at(0).has_tag(Muon::twodcut_dRmin) && event.muons->at(0).has_tag(Muon::twodcut_pTrel)){
+      event.set(h_dRmin_mu_jet,event.muons->at(0).get_tag(Muon::twodcut_dRmin));
+      event.set(h_ptrel_mu_jet,event.muons->at(0).get_tag(Muon::twodcut_pTrel));
+      event.set(h_dRmin_mu_jet_scaled, event.muons->at(0).get_tag(Muon::twodcut_dRmin)*event.jets->at(0).pt());
+    }
+  }
+
+  if(isElectron){
+    if(event.electrons->at(0).has_tag(Electron::twodcut_dRmin) && event.electrons->at(0).has_tag(Electron::twodcut_pTrel)){
+      event.set(h_dRmin_ele_jet,event.electrons->at(0).get_tag(Electron::twodcut_dRmin));
+      event.set(h_ptrel_ele_jet,event.electrons->at(0).get_tag(Electron::twodcut_pTrel));
+      event.set(h_dRmin_ele_jet_scaled, event.electrons->at(0).get_tag(Electron::twodcut_dRmin)*event.jets->at(0).pt());
+    }
+  }
+
+
+  vector<TopJet>* AK8Puppijets = event.toppuppijets;
+  unsigned int NAK8Puppijets = 0;
+  for(unsigned int i=0; i<AK8Puppijets->size(); i++){
+    if(AK8Puppijets->at(i).numberOfDaughters()<2) continue;
+    NAK8Puppijets++;
+
+    event.set(h_deepjet_topscore_jet, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_top());
+    event.set(h_deepjet_wscore_jet, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_w());
+    event.set(h_deepjet_zscore_jet, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_z());
+    event.set(h_deepjet_higgsscore_jet, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_h());
+    event.set(h_deepjet_qcdscore_jet, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_qcd());
+
+
+    if(i==0){
+      event.set(h_deepjet_topscore_jet1, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_top());
+      event.set(h_deepjet_wscore_jet1, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_w());
+      event.set(h_deepjet_zscore_jet1, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_z());
+      event.set(h_deepjet_higgsscore_jet1, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_h());
+      event.set(h_deepjet_qcdscore_jet1, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_qcd());
+    }
+    if(i==1){
+      event.set(h_deepjet_topscore_jet2, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_top());
+      event.set(h_deepjet_wscore_jet2, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_w());
+      event.set(h_deepjet_zscore_jet2, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_z());
+      event.set(h_deepjet_higgsscore_jet2, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_h());
+      event.set(h_deepjet_qcdscore_jet2, AK8Puppijets->at(i).btag_DeepBoosted_raw_score_qcd());
+    }
+
+  }
+
+
+  if(event.bdt_score > 0.75){
+    if(ZprimeTopTag_selection->passes(event)) fill_histograms(event, "SR_1top");
+    else fill_histograms(event, "SR_0top");
+    //    if (event.topjets->size() == 1) fill_histograms(event, "SR_1top");
+    //    else if (event.topjets->size() == 0) fill_histograms(event, "SR_0top");
+  }
+  else {
+    if(event.bdt_score < 0.15) fill_histograms(event, "CR_wjet");
+    else if (event.bdt_score > 0.6) fill_histograms(event, "CR_ttbar");
+  }
+
+  if (event.topjets->size() == 1) fill_histograms(event, "Test_1top");
   return true;
 }
 
-UHH2_REGISTER_ANALYSIS_MODULE(ZprimeAnalysisModule)
+UHH2_REGISTER_ANALYSIS_MODULE(ZprimeBDTApply)

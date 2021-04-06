@@ -10,6 +10,7 @@
 #include <UHH2/common/include/ObjectIdUtils.h>
 #include <UHH2/common/include/TopJetIds.h>
 #include <UHH2/common/include/TTbarGen.h>
+#include <UHH2/common/include/Utils.h>
 #include <UHH2/ZprimeSemiLeptonic/include/ZprimeCandidate.h>
 
 #include <string>
@@ -53,7 +54,6 @@ namespace uhh2 {
     uhh2::Event::Handle<bool> h_is_zprime_reconstructed_correctmatch;
   };
 
-  
   class TTbarSemiLepMatchableSelection: public uhh2::Selection{
   public:
     TTbarSemiLepMatchableSelection();
@@ -76,6 +76,20 @@ namespace uhh2 {
     uhh2::Event::Handle<ZprimeCandidate*> h_BestZprimeCandidate;
     uhh2::Event::Handle<bool> h_is_zprime_reconstructed;
   };
+
+
+  class InvChi2Cut : public Selection{
+  public:
+    explicit InvChi2Cut(uhh2::Context&, float);
+    virtual bool passes(const Event&) override;
+
+  private:
+    float min_;
+    uhh2::Event::Handle<ZprimeCandidate*> h_BestZprimeCandidate;
+    uhh2::Event::Handle<bool> h_is_zprime_reconstructed;
+  };
+
+
 
   class STlepPlusMetCut : public Selection {
 
@@ -130,7 +144,7 @@ namespace uhh2 {
     float min_deltaR_, min_pTrel_;
   };
   ////
-
+  /*
   class TwoDCutALL : public Selection {
 
   public:
@@ -140,6 +154,7 @@ namespace uhh2 {
   private:
     float min_deltaR_, min_pTrel_;
   };
+  */
   ////
 
   class TriangularCuts : public Selection {
@@ -288,5 +303,22 @@ namespace uhh2 {
     std::unordered_map<unsigned long int, std::unordered_map<unsigned long int, std::vector<unsigned long int> > > rle_map_;
   };
   ////
+
+
+
+  class HEMSelection : public Selection{
+  public:
+    explicit HEMSelection(uhh2::Context&);
+    virtual bool passes(const Event&) override;
+
+  private:
+  Year year;
+  int min_runnum = 319077;
+  double eta_up = -1.3;
+  double eta_down = -3.0;
+  double phi_up = -0.87;
+  double phi_down = -1.57;
+  };
+
 
 }
